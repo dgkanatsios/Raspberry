@@ -55,7 +55,7 @@ namespace WeatherShieldTest
                 DeviceID  = "raspberry1",
                 PartitionKey = "raspberry1",
                 CurrentDateTime = DateTime.Now.ToString("MMMM dd, yyyy, H:mm:ss"),
-                RowKey = (DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks).ToString(),
+                RowKey = (DateTime.MaxValue.Ticks - DateTime.Now.Ticks).ToString(),
                 Temperature = shield.Temperature.ToString(),
                 Altitude = shield.Altitude.ToString(),
                 Pressure = shield.Pressure.ToString(),
