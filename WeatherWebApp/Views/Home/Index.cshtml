@@ -1,0 +1,40 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+<div>Temperature-Humidity-Current DateTime</div>
+<div id="results">
+
+</div>
+<div id="lastUpdated"></div>
+
+@section Scripts
+{
+    <script>
+
+        function fetchData() {
+            $.ajax(
+               {
+                   url: "/api/WeatherData",
+                   success: function (result) {
+                       $("#results").empty();
+                       for (var i = 0; i < result.length; i++) {
+                           var element = $("<div />");
+                           element.html(result[i].Temperature + "-" + result[i].Humidity + "-" + result[i].CurrentDateTime);
+                           $("#results").append(element);
+                       }
+                       $("#lastUpdated").html("Last updated at " + new Date());
+                   }
+               });
+        }
+
+        $(function ()
+        {
+            fetchData();
+            setInterval(fetchData, 2000);
+        });
+    </script>
+    }
+
