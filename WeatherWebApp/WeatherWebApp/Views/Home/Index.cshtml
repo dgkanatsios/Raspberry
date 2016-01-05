@@ -22,7 +22,8 @@
                        $("#results").empty();
                        for (var i = 0; i < result.length; i++) {
                            var element = $("<div />");
-                           element.html(result[i].Temperature + "-" + result[i].Humidity + "-" + result[i].CurrentDateTime);
+                           element.html(result[i].Temperature + "-" + result[i].Humidity + "-"
+                               + result[i].CurrentDateTime);
                            $("#results").append(element);
                        }
                        $("#lastUpdated").html("Last updated at " + new Date());
