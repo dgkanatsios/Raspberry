@@ -99,7 +99,10 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SnakeGame.cs" />
+    <Compile Include="SnakeGameLibrary\Snake.cs" />
+    <Compile Include="SnakeGameLibrary\SnakeGame.cs" />
+    <Compile Include="SnakeGameLibrary\SnakeGameArray.cs" />
+    <Compile Include="SnakeGameLibrary\SnakePiece.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

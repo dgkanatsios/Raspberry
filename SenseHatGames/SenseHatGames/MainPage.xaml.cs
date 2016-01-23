@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SenseHatGames.SnakeGameLibrary;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,26 +30,22 @@ namespace SenseHatGames
         {
             this.InitializeComponent();
             this.Loaded += MainPage_Loaded;
-            CoreWindow.GetForCurrentThread().KeyUp += MainPage_KeyUp1;
+            CoreWindow.GetForCurrentThread().KeyUp += KeyboardInput;
         }
 
-
-
-        private Snake.Movement movement = Snake.Movement.Left;
-
-        private void MainPage_KeyUp1(CoreWindow sender, KeyEventArgs args)
+        private void KeyboardInput(CoreWindow sender, KeyEventArgs args)
         {
             if (args.VirtualKey == Windows.System.VirtualKey.Up)
-                movement = Snake.Movement.Top;
+                game.SnakeMovement = SnakeMovement.Top;
             else if (args.VirtualKey == Windows.System.VirtualKey.Down)
-                movement = Snake.Movement.Bottom;
+                game.SnakeMovement = SnakeMovement.Bottom;
             else if (args.VirtualKey == Windows.System.VirtualKey.Left)
-                movement = Snake.Movement.Left;
+                game.SnakeMovement = SnakeMovement.Left;
             else if (args.VirtualKey == Windows.System.VirtualKey.Right)
-                movement = Snake.Movement.Right;
+                game.SnakeMovement = SnakeMovement.Right;
         }
 
-        DispatcherTimer timer = new DispatcherTimer();
+        
         SnakeGame game = new SnakeGame();
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
@@ -59,28 +56,33 @@ namespace SenseHatGames
                 mainGrid.RowDefinitions.Add(new RowDefinition());
                 mainGrid.ColumnDefinitions.Add(new ColumnDefinition());
             }
-
-            Draw();
-
-            timer.Interval = TimeSpan.FromMilliseconds(1000);
-            timer.Tick += Timer_Tick;
-            timer.Start();
+            
+            Draw(game.GameArray);
+            game.Start();
+            game.Updated += Game_Updated;
+            game.PlayerLost += Game_PlayerLost;
         }
 
-        private void Timer_Tick(object sender, object e)
+        private void Game_PlayerLost(object sender, EventArgs e)
         {
-            game.snake.TryMove(movement);
-            Draw();
+            throw new NotImplementedException();
         }
 
-        private void Draw()
+        private void Game_Updated(object sender, EventArgs e)
+        {
+            Draw(game.GameArray);
+        }
+
+        
+
+        private void Draw(SnakeGameArray snakeGameArray)
         {
             mainGrid.Children.Clear();
             for (int row = 0; row < 8; row++)
             {
                 for (int column = 0; column < 8; column++)
                 {
-                    if (game.matrix[row, column] != null)
+                    if (snakeGameArray[row, column] != null)
                     {
                         mainGrid.Children.Add(GetNewEllipse(row, column));
                     }
