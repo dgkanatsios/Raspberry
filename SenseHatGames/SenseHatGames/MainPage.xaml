@@ -7,7 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="Yellow" Name="mainGrid" Width="320" Height="320">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Button x:Name="snakeButton" Content="Snake" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" Click="snakeButton_Click"/>
+        <Button x:Name="tetrisButton" Content="Tetris" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top" Click="tetrisButton_Click"/>
 
     </Grid>
 </Page>

@@ -4,16 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SenseHatGames.SnakeGameLibrary
+namespace SenseHatGames.TetrisGameLibrary
 {
-    public struct RowColumn
+    public class Piece
     {
         public int Row { get; set; }
         public int Column { get; set; }
-
-        public RowColumn(int row, int column)
+        public Piece(int row, int column)
         {
-            Row = row; Column = column;
+            Row = row;
+            Column = column;
         }
+
+     
     }
 }
