@@ -8,20 +8,18 @@ namespace SenseHatGames.SnakeGameLibrary
 {
     public class SnakePiece : PieceBase
     {
-       
-        private SnakeGameArray matrix;
 
-        public SnakePiece(int row, int column, SnakeGameArray _matrix)
-        { Row = row; Column = column; matrix = _matrix; }
+        public SnakePiece(int row, int column)
+        { Row = row; Column = column;  }
     }
 
     public abstract class PieceBase
     {
-        public Tuple<int, int> RowColumn
+        public RowColumn RowColumn
         {
             get
             {
-                return new Tuple<int, int>(Row, Column);
+                return new RowColumn(Row, Column);
             }
         }
         public int Row { get; set; }

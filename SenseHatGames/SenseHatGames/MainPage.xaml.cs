@@ -82,19 +82,24 @@ namespace SenseHatGames
             {
                 for (int column = 0; column < 8; column++)
                 {
-                    if (snakeGameArray[row, column] != null)
+                    PieceBase piece = snakeGameArray[row, column];
+                    if (piece!=null && piece is SnakePiece)
                     {
-                        mainGrid.Children.Add(GetNewEllipse(row, column));
+                        mainGrid.Children.Add(GetNewEllipse(row, column, Colors.Black));
+                    }
+                    else if (piece != null && piece is FruitPiece)
+                    {
+                        mainGrid.Children.Add(GetNewEllipse(row, column, Colors.Red));
                     }
                 }
             }
         }
 
-        private Ellipse GetNewEllipse(int row, int column)
+        private Ellipse GetNewEllipse(int row, int column, Color color)
         {
             Ellipse el = new Ellipse();
             el.Width = el.Height = 40;
-            el.Fill = new SolidColorBrush(Colors.Black);
+            el.Fill = new SolidColorBrush(color);
             Grid.SetColumn(el, column);
             Grid.SetRow(el, row);
             return el;

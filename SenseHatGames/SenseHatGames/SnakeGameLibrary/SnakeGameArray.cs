@@ -6,10 +6,28 @@ using System.Threading.Tasks;
 
 namespace SenseHatGames.SnakeGameLibrary
 {
+    public enum MovementResult
+    {
+        MoveAllowed,
+        FruitEaten,
+        GameOver
+    }
+
     public class SnakeGameArray
     {
-        public SnakePiece[,] matrix;
-        public SnakePiece this[int row, int column]
+        public bool FruitExists
+        {
+            get; set;
+        } = false;
+        public DateTime TimeFruitWasCreatedOrEaten
+        {
+            get; set;
+        }
+
+        private Random random = new Random();
+
+        public PieceBase[,] matrix;
+        public PieceBase this[int row, int column]
         {
             get
             {
@@ -22,52 +40,86 @@ namespace SenseHatGames.SnakeGameLibrary
         }
         public SnakeGameArray()
         {
-            matrix = new SnakePiece[SnakeGame.Rows, SnakeGame.Columns];
+            matrix = new PieceBase[SnakeGame.Rows, SnakeGame.Columns];
             snake = new Snake();
         }
-        public bool TryMove(SnakeMovement direction)
+        public MovementResult TryMove(SnakeMovement direction)
         {
             SnakePiece head = snake[0];
-            var pieceLocation = head.RowColumn;
+            RowColumn newHeadLocation = new RowColumn();
             switch (direction)
             {
                 case SnakeMovement.Left:
-                    if (head.Column == 0 || matrix[head.Row, head.Column - 1] != null)
-                        return false;
+                    if (head.Column == 0 ||
+                        (matrix[head.Row, head.Column - 1] != null && matrix[head.Row, head.Column - 1] is SnakePiece))
+                        return MovementResult.GameOver;
                     else
-                        MovePiece(head,head.Row, head.Column - 1);
+                        newHeadLocation = new RowColumn(head.Row, head.Column - 1);
                     break;
                 case SnakeMovement.Right:
-                    if (head.Column == SnakeGame.Columns - 1 || matrix[head.Row, head.Column + 1] != null)
-                        return false;
+                    if (head.Column == SnakeGame.Columns - 1 ||
+                        (matrix[head.Row, head.Column + 1] != null && matrix[head.Row, head.Column + 1] is SnakePiece))
+                        return MovementResult.GameOver;
                     else
-                        MovePiece(head,head.Row, head.Column + 1);
+                        newHeadLocation = new RowColumn(head.Row, head.Column + 1);
                     break;
                 case SnakeMovement.Top:
-                    if (head.Row == 0 || matrix[head.Row - 1, head.Column] != null)
-                        return false;
+                    if (head.Row == 0 ||
+                        (matrix[head.Row - 1, head.Column] != null && matrix[head.Row - 1, head.Column] is SnakePiece))
+                        return MovementResult.GameOver;
                     else
-                        MovePiece(head, head.Row - 1, head.Column);
+                        newHeadLocation = new RowColumn(head.Row - 1, head.Column);
                     break;
                 case SnakeMovement.Bottom:
-                    if (head.Row == SnakeGame.Rows - 1 || matrix[head.Row + 1, head.Column] != null)
-                        return false;
+                    if (head.Row == SnakeGame.Rows - 1 ||
+                        (matrix[head.Row + 1, head.Column] != null && matrix[head.Row + 1, head.Column] is SnakePiece))
+                        return MovementResult.GameOver;
                     else
-                        MovePiece(head, head.Row + 1, head.Column);
+                        newHeadLocation = new RowColumn(head.Row + 1, head.Column);
                     break;
-                default:
-                    return false;
             }
+
+            MovementResult result = MovementResult.MoveAllowed;
+            if (this[newHeadLocation.Row, newHeadLocation.Column] is FruitPiece)
+                result = MovementResult.FruitEaten;
+
+            var pieceLocation = head.RowColumn;
+            MovePiece(head, newHeadLocation.Row, newHeadLocation.Column);
+
 
             for (int i = 1; i < snake.Count; i++)
             {
                 var cache = snake[i].RowColumn;
-                MovePiece(snake[i], pieceLocation.Item1, pieceLocation.Item2);
+                MovePiece(snake[i], pieceLocation.Row, pieceLocation.Column);
                 pieceLocation = cache;
             }
-            //last one will be null
-            matrix[pieceLocation.Item1, pieceLocation.Item2] = null;
-            return true;
+
+            if (result == MovementResult.MoveAllowed)
+                this[pieceLocation.Row, pieceLocation.Column] = null;
+            else if (result == MovementResult.FruitEaten)
+            {
+                this.AddSnakePiece(new SnakePiece(pieceLocation.Row, pieceLocation.Column));
+                FruitExists = false;
+                TimeFruitWasCreatedOrEaten = DateTime.Now;
+            }
+
+            return result;
+        }
+
+        public void AddFruit()
+        {
+            FruitPiece fruitPiece = new FruitPiece();
+            int fruitRow, fruitColumn;
+            do
+            {
+                fruitRow = random.Next(0, SnakeGame.Rows);
+                fruitColumn = random.Next(0, SnakeGame.Columns);
+            } while
+            (this[fruitRow, fruitColumn] == null &&
+            snake.All((x => Math.Abs(x.Column - fruitColumn) < 2
+            && Math.Abs(x.Row - fruitRow) < 2)));
+
+            this[fruitRow, fruitColumn] = fruitPiece;
         }
 
         private void MovePiece(SnakePiece piece, int newRow, int newColumn)
