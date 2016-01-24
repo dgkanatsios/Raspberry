@@ -41,7 +41,7 @@ namespace SenseHatGames.SnakeGameLibrary
         }
         public SnakeGameArray()
         {
-            matrix = new PieceBase[SnakeGame.Rows, SnakeGame.Columns];
+            matrix = new PieceBase[Constants.Rows, Constants.Columns];
             snake = new Snake();
         }
         public MovementResult TryMove(SnakeMovement direction)
@@ -58,7 +58,7 @@ namespace SenseHatGames.SnakeGameLibrary
                         newHeadLocation = new RowColumn(head.Row, head.Column - 1);
                     break;
                 case SnakeMovement.Right:
-                    if (head.Column == SnakeGame.Columns - 1 ||
+                    if (head.Column == Constants.Columns - 1 ||
                         (matrix[head.Row, head.Column + 1] != null && matrix[head.Row, head.Column + 1] is SnakePiece))
                         return MovementResult.GameOver;
                     else
@@ -72,7 +72,7 @@ namespace SenseHatGames.SnakeGameLibrary
                         newHeadLocation = new RowColumn(head.Row - 1, head.Column);
                     break;
                 case SnakeMovement.Bottom:
-                    if (head.Row == SnakeGame.Rows - 1 ||
+                    if (head.Row == Constants.Rows - 1 ||
                         (matrix[head.Row + 1, head.Column] != null && matrix[head.Row + 1, head.Column] is SnakePiece))
                         return MovementResult.GameOver;
                     else
@@ -113,8 +113,8 @@ namespace SenseHatGames.SnakeGameLibrary
             int fruitRow, fruitColumn;
             do
             {
-                fruitRow = random.Next(0, SnakeGame.Rows);
-                fruitColumn = random.Next(0, SnakeGame.Columns);
+                fruitRow = random.Next(0, Constants.Rows);
+                fruitColumn = random.Next(0, Constants.Columns);
             } while
             (this[fruitRow, fruitColumn] == null &&
             snake.All((x => Math.Abs(x.Column - fruitColumn) < 2

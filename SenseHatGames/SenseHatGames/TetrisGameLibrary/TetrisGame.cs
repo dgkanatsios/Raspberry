@@ -14,8 +14,6 @@ namespace SenseHatGames.TetrisGameLibrary
     public class TetrisGame
     {
         private object lockerObject = new object();
-        public static int Rows = 8;
-        public static int Columns = 8;
         public Shape CurrentShape { get; set; }
         DispatcherTimer timer;
 
@@ -97,9 +95,9 @@ namespace SenseHatGames.TetrisGameLibrary
                     break;
             }
 
-            //if any column is larger than 8
+            //if any column is greater than 7, row less than 0 or greater than 7
             //or there exists another item in the new positions
-            if (pieces.Any(x => x.Row >= Rows) || pieces.Any(x => x.Column >= Columns)
+            if (pieces.Any(x => x.Row >= Constants.Rows) || pieces.Any(x => x.Column >= Constants.Columns)
                 || pieces.Any(x => x.Column < 0) ||
                 pieces.Any(x => GameArray[x.Row, x.Column] != null))
             {
@@ -169,10 +167,10 @@ namespace SenseHatGames.TetrisGameLibrary
 
         private void ClearLinesAndMovePiecesBelow()
         {
-            for (int row = Rows - 1; row >= 0; row--)
+            for (int row = Constants.Rows - 1; row >= 0; row--)
             {
                 bool ShouldClearRow = true;
-                for (int column = 0; column < Columns; column++)
+                for (int column = 0; column < Constants.Columns; column++)
                 {   //if we have at least one empty item, break
                     if (GameArray[row, column] == null)
                     {
@@ -182,7 +180,7 @@ namespace SenseHatGames.TetrisGameLibrary
                 }
                 if (ShouldClearRow)
                 {   //empty current row
-                    for (int column = 0; column < Columns; column++)
+                    for (int column = 0; column < Constants.Columns; column++)
                     {
                         GameArray[row, column] = null;
                     }
@@ -190,7 +188,7 @@ namespace SenseHatGames.TetrisGameLibrary
                     //move all rows above the deleted one, one row below
                     for (int row2 = row - 1; row2 >= 0; row2--)
                     {
-                        for (int column = 0; column < Columns; column++)
+                        for (int column = 0; column < Constants.Columns; column++)
                         {
                             //move row2 to row
                             GameArray[row2 + 1, column] = GameArray[row2, column];
@@ -250,7 +248,7 @@ namespace SenseHatGames.TetrisGameLibrary
         }
         public TetrisGameArray()
         {
-            matrix = new Piece[TetrisGame.Rows, TetrisGame.Columns];
+            matrix = new Piece[Constants.Rows, Constants.Columns];
         }
 
 
