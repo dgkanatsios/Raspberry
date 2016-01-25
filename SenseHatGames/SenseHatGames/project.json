@@ -1,5 +1,6 @@
 ﻿{
   "dependencies": {
+    "Emmellsoft.IoT.RPi.SenseHat": "0.1.0.8",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
   },
   "frameworks": {

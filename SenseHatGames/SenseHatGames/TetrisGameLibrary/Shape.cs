@@ -33,22 +33,6 @@ namespace SenseHatGames.TetrisGameLibrary
             }
         }
 
-        public bool CanRotate
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public bool CanMoveDown
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         private List<List<RowColumn>> RotationModifiers;
 
         public Shape(List<List<RowColumn>> rotationModifiers)
@@ -68,6 +52,8 @@ namespace SenseHatGames.TetrisGameLibrary
                 Piece p = new Piece(this[i].Row, this[i].Column); 
                 copy.Add(p);
             }
+            copy.RotationModifiers = this.RotationModifiers;
+            copy.rotationModifierIndex = this.rotationModifierIndex;
             return copy;
         }
 

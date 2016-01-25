@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI;
 
 namespace SenseHatGames.TetrisGameLibrary
 {
@@ -34,26 +35,27 @@ namespace SenseHatGames.TetrisGameLibrary
 
         private static Shape CreateShape(ShapeType type)
         {
+            Color color = ColorFactory.RandomColor;
             switch (type)
             {
                 case ShapeType.ShapeA:
                     Shape sA = new Shape(shapeAModifiers);
-                    sA.Add(new Piece(0, 3));
-                    sA.Add(new Piece(0, 4));
-                    sA.Add(new Piece(1, 3));
-                    sA.Add(new Piece(1, 4));
+                    sA.Add(new Piece(0, 3,color));
+                    sA.Add(new Piece(0, 4, color));
+                    sA.Add(new Piece(1, 3, color));
+                    sA.Add(new Piece(1, 4, color));
                     return sA;
                 case ShapeType.ShapeB:
                     Shape sB = new Shape(shapeBModifiers);
-                    sB.Add(new Piece(0, 3));
-                    sB.Add(new Piece(1, 3));
-                    sB.Add(new Piece(2, 3));
+                    sB.Add(new Piece(0, 3, color));
+                    sB.Add(new Piece(1, 3, color));
+                    sB.Add(new Piece(2, 3, color));
                     return sB;
                 case ShapeType.ShapeC:
                     Shape sC = new Shape(shapeCModifiers);
-                    sC.Add(new Piece(0, 4));
-                    sC.Add(new Piece(0, 3));
-                    sC.Add(new Piece(1, 3));
+                    sC.Add(new Piece(0, 4, color));
+                    sC.Add(new Piece(0, 3, color));
+                    sC.Add(new Piece(1, 3, color));
                     return sC;
                 default:
                     throw new Exception(type.ToString());

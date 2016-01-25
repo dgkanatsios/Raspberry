@@ -16,6 +16,10 @@ using Windows.UI.Xaml.Navigation;
 using SenseHatGames.TetrisGameLibrary;
 using Windows.UI;
 using Windows.UI.Xaml.Shapes;
+using Emmellsoft.IoT.Rpi.SenseHat;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Diagnostics;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -31,12 +35,13 @@ namespace SenseHatGames
             this.InitializeComponent();
             this.Loaded += TetrisGamePage_Loaded;
             CoreWindow.GetForCurrentThread().KeyUp += KeyboardInput;
-            
+
         }
 
         TetrisGame game;
 
-        private void TetrisGamePage_Loaded(object sender, RoutedEventArgs e)
+
+        private async void TetrisGamePage_Loaded(object sender, RoutedEventArgs e)
         {
             for (int i = 0; i < 8; i++)
             {
@@ -47,24 +52,89 @@ namespace SenseHatGames
             game = new TetrisGame();
             game.GameUpdated += Game_GameUpdated;
             game.Start();
+
+#if ARM
+            await InitializeSenseHatAsync();
+            new Task(async () => await RunAsync()).Start();
+#endif
         }
 
-        private void Game_GameUpdated(object sender, EventArgs e)
+        private async void Game_GameUpdated(object sender, EventArgs e)
         {
-            Draw(game.GameArray);
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+             Draw(game.GameArray));
         }
 
         private void KeyboardInput(CoreWindow sender, KeyEventArgs args)
         {
-            if (args.VirtualKey == Windows.System.VirtualKey.Up)
-                game.TryRotate();
-            //else if (args.VirtualKey == Windows.System.VirtualKey.Down)
-            //    //game.SnakeMovement = SnakeMovement.Bottom;
-            else if (args.VirtualKey == Windows.System.VirtualKey.Left)
-                game.Move(Movement.Left);
-            else if (args.VirtualKey == Windows.System.VirtualKey.Right)
-                game.Move(Movement.Right);
+            CorePhysicalKeyStatus cpk = args.KeyStatus;
+            if (cpk.IsKeyReleased)
+            {
+                if (args.VirtualKey == Windows.System.VirtualKey.Up)
+                    game.TryRotate();
+                else if (args.VirtualKey == Windows.System.VirtualKey.Down)
+                    game.Move(Movement.Bottom);
+                else if (args.VirtualKey == Windows.System.VirtualKey.Left)
+                    game.Move(Movement.Left);
+                else if (args.VirtualKey == Windows.System.VirtualKey.Right)
+                    game.Move(Movement.Right);
+            }
         }
+
+        public async Task RunAsync()
+        {
+            SenseHat.Display.Clear();
+            while (true)
+            {
+                if (SenseHat.Joystick.Update()) // Has any of the buttons on the joystick changed?
+                {
+                    if (SenseHat.Joystick.LeftKey == KeyState.Pressed)
+                    {
+                        game.Move(Movement.Left);
+                    }
+                    else if (SenseHat.Joystick.RightKey == KeyState.Pressed)
+                    {
+                        game.Move(Movement.Right);
+                    }
+                    else if (SenseHat.Joystick.DownKey == KeyState.Pressed)
+                    {
+                        game.Move(Movement.Bottom);
+                    }
+                    else if (SenseHat.Joystick.UpKey == KeyState.Pressed)
+                    {
+                        game.TryRotate();
+                    }
+                }
+                SenseHat.Display.Clear();
+                FillDisplay();
+                SenseHat.Display.Update();
+                await Task.Delay(50);
+            }
+        }
+        ISenseHat SenseHat;
+
+        private void FillDisplay()
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                for (int x = 0; x < 8; x++)
+                {
+                    Piece piece = game.GameArray[x, y];
+                    if (piece != null)
+                    {
+                        SenseHat.Display.Screen[y, x] = piece.Color;
+                    }
+                }
+
+            }
+        }
+
+
+        private async Task InitializeSenseHatAsync()
+        {
+            SenseHat = await SenseHatFactory.Singleton.GetSenseHat().ConfigureAwait(false);
+        }
+
 
         private void Draw(TetrisGameArray tetrisGameArray)
         {
@@ -76,9 +146,9 @@ namespace SenseHatGames
                     Piece piece = tetrisGameArray[row, column];
                     if (piece != null)
                     {
-                        mainGrid.Children.Add(GetNewEllipse(row, column, Colors.Black));
+                        mainGrid.Children.Add(GetNewEllipse(row, column, piece.Color));
                     }
-                    
+
                 }
             }
         }

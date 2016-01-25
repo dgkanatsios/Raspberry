@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI;
 
 namespace SenseHatGames.SnakeGameLibrary
 {
@@ -99,7 +100,7 @@ namespace SenseHatGames.SnakeGameLibrary
                 this[pieceLocation.Row, pieceLocation.Column] = null;
             else if (result == MovementResult.FruitEaten)
             {
-                this.AddSnakePiece(new SnakePiece(pieceLocation.Row, pieceLocation.Column));
+                this.AddSnakePiece(new SnakePiece(pieceLocation.Row, pieceLocation.Column, Colors.Navy));
                 FruitExists = false;
                 TimeFruitWasCreatedOrEaten = DateTime.Now;
             }
@@ -110,15 +111,14 @@ namespace SenseHatGames.SnakeGameLibrary
         public void AddFruit()
         {
             FruitPiece fruitPiece = new FruitPiece();
+            fruitPiece.Color = ColorFactory.RandomColor;
             int fruitRow, fruitColumn;
             do
             {
                 fruitRow = random.Next(0, Constants.Rows);
                 fruitColumn = random.Next(0, Constants.Columns);
             } while
-            (this[fruitRow, fruitColumn] == null &&
-            snake.All((x => Math.Abs(x.Column - fruitColumn) < 2
-            && Math.Abs(x.Row - fruitRow) < 2)));
+            (this[fruitRow, fruitColumn] != null);
 
             this[fruitRow, fruitColumn] = fruitPiece;
         }

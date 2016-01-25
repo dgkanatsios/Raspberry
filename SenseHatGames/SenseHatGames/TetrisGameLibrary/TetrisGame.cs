@@ -32,7 +32,7 @@ namespace SenseHatGames.TetrisGameLibrary
         {
             this.Stop();
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Interval = TimeSpan.FromMilliseconds(1000);
             timer.Tick += Timer_Tick;
             timer.Start();
 
@@ -52,15 +52,41 @@ namespace SenseHatGames.TetrisGameLibrary
 
         public void TryRotate()
         {
-            ClearPreviousCurrentShapePosition();
-            CurrentShape.Rotate();
-            PlaceCurrentShape();
-            GameUpdated?.Invoke(this, EventArgs.Empty);
+            if (CanRotationBeMade())
+            {
+                ClearPreviousCurrentShapePosition();
+                CurrentShape.Rotate();
+                PlaceCurrentShape();
+                GameUpdated?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         private void Timer_Tick(object sender, object e)
         {
             this.Move(Movement.Bottom);
+        }
+
+        private bool CanRotationBeMade()
+        {
+            //we need to see if this can be rotated
+            //get a local copy
+            Shape localCopy = CurrentShape.Clone();
+            localCopy.Rotate();
+            Piece[] pieces = localCopy.ToArray();
+            if (pieces.Any(x => x.Row >= Constants.Rows) || pieces.Any(x => x.Column >= Constants.Columns)
+                || pieces.Any(x => x.Column < 0) ||
+                //we get the new position of each piece
+                //we check if already exists a piece in this position in the array
+                //and this position is *not* in the current shape :)
+                (pieces.Any(x => GameArray[x.Row, x.Column] != null
+                && CurrentShape.Where(y => y.Row == x.Row && y.Column == x.Column).Count() == 0)))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         private bool CanMovementCanBeMade(Movement movement)
@@ -99,7 +125,11 @@ namespace SenseHatGames.TetrisGameLibrary
             //or there exists another item in the new positions
             if (pieces.Any(x => x.Row >= Constants.Rows) || pieces.Any(x => x.Column >= Constants.Columns)
                 || pieces.Any(x => x.Column < 0) ||
-                pieces.Any(x => GameArray[x.Row, x.Column] != null))
+                //we get the new position of each piece
+                //we check if already exists a piece in this position in the array
+                //and this position is *not* in the current shape :)
+                (pieces.Any(x => GameArray[x.Row, x.Column] != null
+                && CurrentShape.Where(y => y.Row == x.Row && y.Column == x.Column).Count() == 0)))
             {
                 //movement cannot be done
                 return false;

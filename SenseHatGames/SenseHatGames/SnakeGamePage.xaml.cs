@@ -1,9 +1,11 @@
-﻿using SenseHatGames.SnakeGameLibrary;
+﻿using Emmellsoft.IoT.Rpi.SenseHat;
+using SenseHatGames.SnakeGameLibrary;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
@@ -48,7 +50,7 @@ namespace SenseHatGames
         
         SnakeGame game = new SnakeGame();
 
-        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
 
             for (int i = 0; i < 8; i++)
@@ -58,22 +60,82 @@ namespace SenseHatGames
             }
             
             Draw(game.GameArray);
-            game.Start();
+            
             game.Updated += Game_Updated;
             game.PlayerLost += Game_PlayerLost;
+            game.Start();
+#if ARM
+            await InitializeSenseHatAsync();
+            new Task(async () => await RunAsync()).Start();
+#endif
         }
 
         private void Game_PlayerLost(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            game.Stop();
         }
 
-        private void Game_Updated(object sender, EventArgs e)
+        private async void Game_Updated(object sender, EventArgs e)
         {
-            Draw(game.GameArray);
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,()=>
+            Draw(game.GameArray));
         }
 
-        
+        public async Task RunAsync()
+        {
+            SenseHat.Display.Clear();
+            while (true)
+            {
+               
+                if (SenseHat.Joystick.Update()) // Has any of the buttons on the joystick changed?
+                {
+                    if (SenseHat.Joystick.LeftKey == KeyState.Pressed)
+                    {
+                        game.SnakeMovement = SnakeMovement.Left;
+                    }
+                    else if (SenseHat.Joystick.RightKey == KeyState.Pressed)
+                    {
+                        game.SnakeMovement = SnakeMovement.Right;
+                    }
+                    else if (SenseHat.Joystick.DownKey == KeyState.Pressed)
+                    {
+                        game.SnakeMovement = SnakeMovement.Bottom;
+                    }
+                    else if (SenseHat.Joystick.UpKey == KeyState.Pressed)
+                    {
+                        game.SnakeMovement = SnakeMovement.Top;
+                    }
+                }
+                SenseHat.Display.Clear();
+                FillDisplay();
+                SenseHat.Display.Update();
+
+                await Task.Delay(50);
+            }
+        }
+        ISenseHat SenseHat;
+
+        private void FillDisplay()
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                for (int x = 0; x < 8; x++)
+                {
+                    PieceBase piece = game.GameArray[x, y];
+                    if (piece != null)
+                    {
+                        SenseHat.Display.Screen[y, x] = piece.Color;
+                    }
+                }
+
+            }
+        }
+
+
+        private async Task InitializeSenseHatAsync()
+        {
+            SenseHat = await SenseHatFactory.Singleton.GetSenseHat().ConfigureAwait(false);
+        }
 
         private void Draw(SnakeGameArray snakeGameArray)
         {
@@ -85,11 +147,11 @@ namespace SenseHatGames
                     PieceBase piece = snakeGameArray[row, column];
                     if (piece!=null && piece is SnakePiece)
                     {
-                        mainGrid.Children.Add(GetNewEllipse(row, column, Colors.Black));
+                        mainGrid.Children.Add(GetNewEllipse(row, column, piece.Color));
                     }
                     else if (piece != null && piece is FruitPiece)
                     {
-                        mainGrid.Children.Add(GetNewEllipse(row, column, Colors.Red));
+                        mainGrid.Children.Add(GetNewEllipse(row, column, piece.Color));
                     }
                 }
             }
