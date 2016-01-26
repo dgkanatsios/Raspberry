@@ -96,7 +96,7 @@ namespace SenseHatGames.TetrisGameLibrary
             if (pieces.Any(x => x.Row >= Constants.Rows) || pieces.Any(x => x.Column >= Constants.Columns)
                 || pieces.Any(x => x.Column < 0) ||
                 //we get the new position of each piece
-                //we check if already exists a piece in this position in the array
+                //we check if a piece in this position in the array already exists
                 //and this position is *not* in the current shape :)
                 (pieces.Any(x => GameArray[x.Row, x.Column] != null
                 && CurrentShape.Where(y => y.Row == x.Row && y.Column == x.Column).Count() == 0)))
@@ -146,7 +146,7 @@ namespace SenseHatGames.TetrisGameLibrary
             if (pieces.Any(x => x.Row >= Constants.Rows) || pieces.Any(x => x.Column >= Constants.Columns)
                 || pieces.Any(x => x.Column < 0) ||
                 //we get the new position of each piece
-                //we check if already exists a piece in this position in the array
+                //we check if a piece in this position in the array already exists
                 //and this position is *not* in the current shape :)
                 (pieces.Any(x => GameArray[x.Row, x.Column] != null
                 && CurrentShape.Where(y => y.Row == x.Row && y.Column == x.Column).Count() == 0)))
