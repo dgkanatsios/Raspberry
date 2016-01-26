@@ -18,7 +18,40 @@ namespace SenseHatGames.SnakeGameLibrary
         }
         //timer to coordinate snake movement
         DispatcherTimer timer;
-        public SnakeMovement SnakeMovement { get; set; } = SnakeMovement.Left;
+        private SnakeMovement snakeMovement = SnakeMovement.Left;
+
+        public SnakeMovement SnakeMovement
+        {
+            get
+            {
+                return snakeMovement;
+            }
+            set //do not allow to set the movement in the opposite direction, i.e. the snake can't move backwards!
+            {
+                switch (value)
+                {
+                    case SnakeMovement.Left:
+                        if (snakeMovement == SnakeMovement.Right)
+                            return;
+                        break;
+                    case SnakeMovement.Right:
+                        if (snakeMovement == SnakeMovement.Left)
+                            return;
+                        break;
+                    case SnakeMovement.Top:
+                        if (snakeMovement == SnakeMovement.Bottom)
+                            return;
+                        break;
+                    case SnakeMovement.Bottom:
+                        if (snakeMovement == SnakeMovement.Top)
+                            return;
+                        break;
+                    default:
+                        break;
+                }
+                snakeMovement = value;
+            }
+        }
         //launch one fruit every three seconds, starting from the time fruit was eaten
         private TimeSpan DurationTillNextFruit = TimeSpan.FromSeconds(3);
 
@@ -42,7 +75,7 @@ namespace SenseHatGames.SnakeGameLibrary
         /// </summary>
         private void TryMove()
         {
-            if(GameArray.TryMove(SnakeMovement) == MovementResult.GameOver)
+            if (GameArray.TryMove(SnakeMovement) == MovementResult.GameOver)
             {
                 PlayerLost?.Invoke(this, EventArgs.Empty);
             }
@@ -75,7 +108,7 @@ namespace SenseHatGames.SnakeGameLibrary
         private void Timer_Tick(object sender, object e)
         {
             //check if a new fruit must be added
-            if(!GameArray.FruitExists &&
+            if (!GameArray.FruitExists &&
                 GameArray.TimeFruitWasCreatedOrEaten + DurationTillNextFruit > DateTime.Now)
             {
                 //create new fruit
