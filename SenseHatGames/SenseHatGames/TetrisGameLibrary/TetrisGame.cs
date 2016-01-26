@@ -25,6 +25,9 @@ namespace SenseHatGames.TetrisGameLibrary
         //raised when the state is updated
         public event EventHandler GameUpdated;
 
+        //raised when the user has lost
+        public event EventHandler PlayerLost;
+
         public TetrisGameArray GameArray
         {
             get; private set;
@@ -52,6 +55,15 @@ namespace SenseHatGames.TetrisGameLibrary
         {
             ClearPreviousCurrentShapePosition();
             CurrentShape = ShapeFactory.CreateRandomShape();
+            //check if the position we want to place current shape is occupied by another item
+            foreach (var item in CurrentShape)
+            {
+                if(GameArray[item.Row,item.Column]!=null)
+                {
+                    PlayerLost?.Invoke(this, EventArgs.Empty);
+                    return;
+                }
+            }
             PlaceCurrentShape();
             GameUpdated?.Invoke(this, EventArgs.Empty);
         }

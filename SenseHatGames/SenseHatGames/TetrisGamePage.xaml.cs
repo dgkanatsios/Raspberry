@@ -53,12 +53,18 @@ namespace SenseHatGames
 
             game = new TetrisGame();
             game.GameUpdated += Game_GameUpdated;
+            game.PlayerLost += Game_PlayerLost;
             game.Start();
 
 #if ARM
             await InitializeSenseHatAsync();
             new Task(async () => await RunAsync()).Start();
 #endif
+        }
+
+        private void Game_PlayerLost(object sender, EventArgs e)
+        {
+            game.Stop();
         }
 
         private async void Game_GameUpdated(object sender, EventArgs e)
