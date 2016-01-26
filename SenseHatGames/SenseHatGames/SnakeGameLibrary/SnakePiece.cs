@@ -8,13 +8,10 @@ using Windows.UI;
 
 namespace SenseHatGames.SnakeGameLibrary
 {
-    public class SnakePiece : PieceBase
-    {
-
-        public SnakePiece(int row, int column, Color color)
-        { Row = row; Column = column; Color = color; }
-    }
-
+    /// <summary>
+    /// Abstract class for all the pieces in the Snake game
+    /// Contains information abour Row, Column and Color
+    /// </summary>
     public abstract class PieceBase
     {
         public RowColumn RowColumn
@@ -28,6 +25,18 @@ namespace SenseHatGames.SnakeGameLibrary
         public int Column { get; set; }
         public Color Color { get; set; }
     }
+
+    public class SnakePiece : PieceBase
+    {
+        public SnakePiece(int row, int column, Color color)
+        {
+            Row = row;
+            Column = column;
+            Color = color;
+        }
+    }
+
+
 
     public class FruitPiece : PieceBase
     {

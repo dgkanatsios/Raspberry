@@ -7,6 +7,9 @@ using Windows.UI;
 
 namespace SenseHatGames.TetrisGameLibrary
 {
+    /// <summary>
+    /// Class for each piece in the Tetris-like game
+    /// </summary>
     public class Piece
     {
         public int Row { get; set; }

@@ -8,6 +8,9 @@ using Windows.UI;
 
 namespace SenseHatGames.TetrisGameLibrary
 {
+    /// <summary>
+    /// Static class to facilitate creation of the shapes
+    /// </summary>
     public static class ShapeFactory
     {
         private static List<List<RowColumn>> shapeAModifiers = new List<List<RowColumn>>();
@@ -25,6 +28,10 @@ namespace SenseHatGames.TetrisGameLibrary
         };
 
         private static Random random = new Random();
+        /// <summary>
+        /// Returns a random shape, out of the three we have
+        /// </summary>
+        /// <returns></returns>
         public static Shape CreateRandomShape()
         {
             int x = random.Next(0, 3);
@@ -33,6 +40,11 @@ namespace SenseHatGames.TetrisGameLibrary
             else return CreateShape(ShapeType.ShapeC);
         }
 
+        /// <summary>
+        /// Creates the requested shape and assigns proper row/column information
+        /// </summary>
+        /// <param name="type">Shape's type</param>
+        /// <returns>A new shape with the requested</returns>
         private static Shape CreateShape(ShapeType type)
         {
             Color color = ColorFactory.RandomColor;
@@ -63,6 +75,9 @@ namespace SenseHatGames.TetrisGameLibrary
         }
     }
 
+    /// <summary>
+    /// Shape Types
+    /// </summary>
     public enum ShapeType
     {
         ShapeA,

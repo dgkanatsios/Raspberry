@@ -9,14 +9,20 @@ using Windows.UI.Xaml;
 
 namespace SenseHatGames.TetrisGameLibrary
 {
+    //Allowed movement for the shape
     public enum Movement { Left, Bottom, Right };
 
+    /// <summary>
+    /// Our tetris-like game base class
+    /// </summary>
     public class TetrisGame
     {
+        //useful for the lock construct in the Move method
         private object lockerObject = new object();
+        //a reference to the current moveable shape
         public Shape CurrentShape { get; set; }
         DispatcherTimer timer;
-
+        //raised when the state is updated
         public event EventHandler GameUpdated;
 
         public TetrisGameArray GameArray
@@ -28,6 +34,9 @@ namespace SenseHatGames.TetrisGameLibrary
             GameArray = new TetrisGameArray();
         }
 
+        /// <summary>
+        /// Initializes the timer and creates the first shape
+        /// </summary>
         public void Start()
         {
             this.Stop();
@@ -37,7 +46,6 @@ namespace SenseHatGames.TetrisGameLibrary
             timer.Start();
 
             CreateNewShape();
-
         }
 
         private void CreateNewShape()
@@ -141,15 +149,23 @@ namespace SenseHatGames.TetrisGameLibrary
             }
         }
 
+        /// <summary>
+        /// Try and move the shape
+        /// </summary>
+        /// <param name="movement"></param>
         public void Move(Movement movement)
         {
             if (CurrentShape == null) return;
 
+            //"sensitive" area
             lock (lockerObject)
             {
+                //check if shape can be moved
                 if (CanMovementCanBeMade(movement))
                 {
+                    //nullify its previous position in the array
                     ClearPreviousCurrentShapePosition();
+                    //update all pieces' row or column information according to the movement requested
                     switch (movement)
                     {
                         case Movement.Left:
@@ -159,7 +175,6 @@ namespace SenseHatGames.TetrisGameLibrary
                             }
                             break;
                         case Movement.Bottom:
-                            //update all the shape rows - movement can be done
                             for (int i = 0; i < CurrentShape.Count; i++)
                             {
                                 CurrentShape[i].Row++;
@@ -174,46 +189,57 @@ namespace SenseHatGames.TetrisGameLibrary
                         default:
                             break;
                     }
-
+                    //move the current shape in the array
                     PlaceCurrentShape();
                     GameUpdated?.Invoke(this, EventArgs.Empty);
                 }
                 else//movement cannot be made
                 {
+                    //item cannot be moved
+                    //if the requested movement is bottom, this means that the shape cannot move even further
+                    //so we need to 1. check if any row(s) are full of pieces, i.e. there exists a horizontal line
+                    //2. remove these lines
+                    //3. move all the rest lines towards the bottom of the array
+                    //4. request another shape
                     if (movement == Movement.Bottom)
                     {
                         CurrentShape = null;
                         //check and clear lines
                         //move pieces below
                         ClearLinesAndMovePiecesBelow();
-
                         //create new shape
-
                         CreateNewShape();
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Clears lines that have no null items
+        /// Moves the rest of the lines below
+        /// </summary>
         private void ClearLinesAndMovePiecesBelow()
         {
+            //we check all rows
             for (int row = Constants.Rows - 1; row >= 0; row--)
             {
                 bool ShouldClearRow = true;
                 for (int column = 0; column < Constants.Columns; column++)
-                {   //if we have at least one empty item, break
+                {   //if we have at least one empty item, check the next row
                     if (GameArray[row, column] == null)
                     {
                         ShouldClearRow = false;
                         break;
                     }
                 }
+                //current row is to be removed
                 if (ShouldClearRow)
                 {   //empty current row
                     for (int column = 0; column < Constants.Columns; column++)
                     {
                         GameArray[row, column] = null;
                     }
+                    //top row, so nothing more to do here
                     if (row == 0) continue;
                     //move all rows above the deleted one, one row below
                     for (int row2 = row - 1; row2 >= 0; row2--)
@@ -233,6 +259,9 @@ namespace SenseHatGames.TetrisGameLibrary
             }
         }
 
+        /// <summary>
+        /// Stops the timer
+        /// </summary>
         public void Stop()
         {
             timer?.Stop();
@@ -240,7 +269,9 @@ namespace SenseHatGames.TetrisGameLibrary
         }
 
 
-
+        /// <summary>
+        /// Sets the shape's position in the array
+        /// </summary>
         private void PlaceCurrentShape()
         {
             for (int i = 0; i < CurrentShape.Count; i++)
@@ -250,6 +281,9 @@ namespace SenseHatGames.TetrisGameLibrary
             }
         }
 
+        /// <summary>
+        /// The shape is to be moved, so we nullify its previous position
+        /// </summary>
         private void ClearPreviousCurrentShapePosition()
         {
             if (CurrentShape != null)
@@ -260,29 +294,5 @@ namespace SenseHatGames.TetrisGameLibrary
         }
     }
 
-    public class TetrisGameArray
-    {
-        private Random random = new Random();
-
-        public Piece[,] matrix;
-        public Piece this[int row, int column]
-        {
-            get
-            {
-                return matrix[row, column];
-            }
-            set
-            {
-                matrix[row, column] = value;
-            }
-        }
-        public TetrisGameArray()
-        {
-            matrix = new Piece[Constants.Rows, Constants.Columns];
-        }
-
-
-
-
-    }
+    
 }

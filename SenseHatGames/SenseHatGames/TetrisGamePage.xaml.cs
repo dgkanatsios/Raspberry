@@ -20,6 +20,7 @@ using Emmellsoft.IoT.Rpi.SenseHat;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
+using SenseHatGames.Common;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -39,6 +40,7 @@ namespace SenseHatGames
         }
 
         TetrisGame game;
+        ISenseHat SenseHat;
 
 
         private async void TetrisGamePage_Loaded(object sender, RoutedEventArgs e)
@@ -61,10 +63,11 @@ namespace SenseHatGames
 
         private async void Game_GameUpdated(object sender, EventArgs e)
         {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-             Draw(game.GameArray));
+            await Dispatcher.RunAsync(
+                CoreDispatcherPriority.Normal, () => Draw(game.GameArray));
         }
 
+        //keyboard input
         private void KeyboardInput(CoreWindow sender, KeyEventArgs args)
         {
             CorePhysicalKeyStatus cpk = args.KeyStatus;
@@ -111,7 +114,7 @@ namespace SenseHatGames
                 await Task.Delay(50);
             }
         }
-        ISenseHat SenseHat;
+
 
         private void FillDisplay()
         {
@@ -138,7 +141,7 @@ namespace SenseHatGames
 
         private void Draw(TetrisGameArray tetrisGameArray)
         {
-            mainGrid.Children.Clear();
+            ClearEllipsesFromGrid();
             for (int row = 0; row < 8; row++)
             {
                 for (int column = 0; column < 8; column++)
@@ -157,12 +160,25 @@ namespace SenseHatGames
 
         private Ellipse GetNewEllipse(int row, int column, Color color)
         {
-            Ellipse el = new Ellipse();
+            Ellipse el = ObjectPooler.GetEllipse();
             el.Width = el.Height = 40;
             el.Fill = new SolidColorBrush(color);
             Grid.SetColumn(el, column);
             Grid.SetRow(el, row);
             return el;
+        }
+
+        private void ClearEllipsesFromGrid()
+        {
+            for (int i = 0; i < mainGrid.Children.Count; i++)
+            {
+                var ellipse = mainGrid.Children[i] as Ellipse;
+                if (ellipse != null)
+                {
+                    ObjectPooler.RemoveEllipse(ellipse);
+                }
+            }
+            mainGrid.Children.Clear();
         }
     }
 }

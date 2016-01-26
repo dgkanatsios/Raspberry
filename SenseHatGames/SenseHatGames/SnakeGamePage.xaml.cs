@@ -1,4 +1,5 @@
 ﻿using Emmellsoft.IoT.Rpi.SenseHat;
+using SenseHatGames.Common;
 using SenseHatGames.SnakeGameLibrary;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,10 @@ namespace SenseHatGames
             CoreWindow.GetForCurrentThread().KeyUp += KeyboardInput;
         }
 
+        SnakeGame game = new SnakeGame();
+        ISenseHat SenseHat;
+
+        //keyboard handling 
         private void KeyboardInput(CoreWindow sender, KeyEventArgs args)
         {
             if (args.VirtualKey == Windows.System.VirtualKey.Up)
@@ -47,23 +52,25 @@ namespace SenseHatGames
                 game.SnakeMovement = SnakeMovement.Right;
         }
 
-        
-        SnakeGame game = new SnakeGame();
+
+
 
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-
-            for (int i = 0; i < 8; i++)
+            //initialize rows and columns for the grid
+            for (int i = 0; i < Constants.Rows; i++)
             {
                 mainGrid.RowDefinitions.Add(new RowDefinition());
                 mainGrid.ColumnDefinitions.Add(new ColumnDefinition());
             }
-            
+
             Draw(game.GameArray);
-            
+
             game.Updated += Game_Updated;
             game.PlayerLost += Game_PlayerLost;
             game.Start();
+
+            //if running on Raspberry
 #if ARM
             await InitializeSenseHatAsync();
             new Task(async () => await RunAsync()).Start();
@@ -75,18 +82,19 @@ namespace SenseHatGames
             game.Stop();
         }
 
+        //redraw the array
         private async void Game_Updated(object sender, EventArgs e)
         {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal,()=>
-            Draw(game.GameArray));
+            await Dispatcher.RunAsync(
+                CoreDispatcherPriority.Normal, () => Draw(game.GameArray));
         }
 
         public async Task RunAsync()
         {
+            //clear the display
             SenseHat.Display.Clear();
             while (true)
             {
-               
                 if (SenseHat.Joystick.Update()) // Has any of the buttons on the joystick changed?
                 {
                     if (SenseHat.Joystick.LeftKey == KeyState.Pressed)
@@ -109,12 +117,13 @@ namespace SenseHatGames
                 SenseHat.Display.Clear();
                 FillDisplay();
                 SenseHat.Display.Update();
-
-                await Task.Delay(50);
+                await Task.Delay(50); //sleep for 50 miliseconds
             }
         }
-        ISenseHat SenseHat;
-
+        
+        /// <summary>
+        /// Draw all pieces on the display
+        /// </summary>
         private void FillDisplay()
         {
             for (int y = 0; y < 8; y++)
@@ -127,7 +136,6 @@ namespace SenseHatGames
                         SenseHat.Display.Screen[y, x] = piece.Color;
                     }
                 }
-
             }
         }
 
@@ -137,15 +145,19 @@ namespace SenseHatGames
             SenseHat = await SenseHatFactory.Singleton.GetSenseHat().ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Draw all pieces on the XAML grid
+        /// </summary>
+        /// <param name="snakeGameArray"></param>
         private void Draw(SnakeGameArray snakeGameArray)
         {
-            mainGrid.Children.Clear();
+            ClearEllipsesFromGrid();
             for (int row = 0; row < 8; row++)
             {
                 for (int column = 0; column < 8; column++)
                 {
                     PieceBase piece = snakeGameArray[row, column];
-                    if (piece!=null && piece is SnakePiece)
+                    if (piece != null && piece is SnakePiece)
                     {
                         mainGrid.Children.Add(GetNewEllipse(row, column, piece.Color));
                     }
@@ -157,14 +169,36 @@ namespace SenseHatGames
             }
         }
 
+        /// <summary>
+        /// Get a new ellipse from the object pooler
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <param name="color"></param>
+        /// <returns></returns>
         private Ellipse GetNewEllipse(int row, int column, Color color)
         {
-            Ellipse el = new Ellipse();
-            el.Width = el.Height = 40;
+            Ellipse el = ObjectPooler.GetEllipse();
             el.Fill = new SolidColorBrush(color);
             Grid.SetColumn(el, column);
             Grid.SetRow(el, row);
             return el;
+        }
+
+        /// <summary>
+        /// Removes all ellipses from Grid and marks them as unused in the object pooler
+        /// </summary>
+        private void ClearEllipsesFromGrid()
+        {
+            for (int i = 0; i < mainGrid.Children.Count; i++)
+            {
+                var ellipse = mainGrid.Children[i] as Ellipse;
+                if (ellipse != null)
+                {
+                    ObjectPooler.RemoveEllipse(ellipse);
+                }
+            }
+            mainGrid.Children.Clear();
         }
 
     }

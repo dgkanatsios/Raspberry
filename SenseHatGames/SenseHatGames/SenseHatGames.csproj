@@ -97,22 +97,24 @@
     </Compile>
     <Compile Include="Common\ColorFactory.cs" />
     <Compile Include="Common\Constants.cs" />
+    <Compile Include="Common\ObjectPooler.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SnakeGameLibrary\Snake.cs" />
+    <Compile Include="SnakeGameLibrary\SnakeGame.cs" />
     <Compile Include="SnakeGamePage.xaml.cs">
       <DependentUpon>SnakeGamePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\RowColumn.cs" />
-    <Compile Include="SnakeGameLibrary\Snake.cs" />
-    <Compile Include="SnakeGameLibrary\SnakeGame.cs" />
     <Compile Include="SnakeGameLibrary\SnakeGameArray.cs" />
     <Compile Include="SnakeGameLibrary\SnakePiece.cs" />
     <Compile Include="TetrisGameLibrary\Piece.cs" />
     <Compile Include="TetrisGameLibrary\Shape.cs" />
     <Compile Include="TetrisGameLibrary\ShapeFactory.cs" />
     <Compile Include="TetrisGameLibrary\TetrisGame.cs" />
+    <Compile Include="TetrisGameLibrary\TetrisGameArray.cs" />
     <Compile Include="TetrisGamePage.xaml.cs">
       <DependentUpon>TetrisGamePage.xaml</DependentUpon>
     </Compile>

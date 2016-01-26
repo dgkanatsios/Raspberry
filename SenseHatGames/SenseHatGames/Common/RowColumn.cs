@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace SenseHatGames.Common
 {
+    /// <summary>
+    /// Helpful struct to encapsulate Row and Column information
+    /// </summary>
     public struct RowColumn
     {
         public int Row { get; set; }
