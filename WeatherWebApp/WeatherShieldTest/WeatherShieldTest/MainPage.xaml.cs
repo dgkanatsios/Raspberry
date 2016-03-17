@@ -36,7 +36,7 @@ namespace WeatherShieldTest
             ReadySet();
 
             client = DeviceClient.CreateFromConnectionString(
-                "INSERT CONNECTION STRING HERE", TransportType.Http1);
+                "HostName=dotnetzoneiot.azure-devices.net;DeviceId=raspberry1;SharedAccessKey=V+GiRinvnuJTsLa+85NtQcnvRYP28ecP41tm5OmZUVY=", TransportType.Http1);
 
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(30);
