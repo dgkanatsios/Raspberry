@@ -33,7 +33,7 @@ namespace SenseHatIoTHub
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             //get a reference to SenseHat
-            senseHat = await SenseHatFactory.Singleton.GetSenseHat();
+            senseHat = await SenseHatFactory.GetSenseHat();
             //initialize the timer
             DispatcherTimer timer = new DispatcherTimer();
             timer.Tick += Timer_Tick;
