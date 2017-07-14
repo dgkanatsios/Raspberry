@@ -13,5 +13,5 @@ For more information, check my blog post:   http://dgkanatsios.com/2015/12/25/ra
 A simple solution that uses a Raspberry Pi 2 and a Sense Hat to get some humidity, temperature and pressure data, post it on Azure IoT Hub. For more information, check my blog post: 
 http://dgkanatsios.com/2016/03/09/raspberry-pi-sense-hat-azure-iot-hub-oh-my/
 
-## cameraprint
-Work in progress. Make a Raspberry PI recognize a QR code and print information on a connected printer.
+## QRRecognizePrint
+Make a Raspberry PI recognize a QR code and print information on a connected thermal printer, like [this](https://www.adafruit.com/product/597) one.
