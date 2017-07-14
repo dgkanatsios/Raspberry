@@ -7,6 +7,7 @@ const ImageParser = require('image-parser');
 const interval = 1000;
 const thermal = require('./thermal')('/dev/serial0', 19200);
 const qrResults = new Array();
+const deleteOldImages = false;
 
 const opts = {
     //width: 1280,
@@ -68,8 +69,8 @@ function process() {
         }
         else {
             console.log(`image saved at ${data}`);
-            //if (previousImage != '')
-            //    fs.unlinkSync(previousImage);
+            if (previousImage != '' && deleteOldImages)
+                fs.unlinkSync(previousImage);
             previousImage = data;
             const c = fs.readFileSync(__dirname + `/${data}`);
             const img = new ImageParser(c);
