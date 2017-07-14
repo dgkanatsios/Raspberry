@@ -1,17 +1,20 @@
+'use strict';
 const NodeWebcam = require('node-webcam');
 const uuidv4 = require('uuid/v4');
 const QrCode = require('qrcode-reader');
 const fs = require('fs');
 const ImageParser = require('image-parser');
-
+const interval = 1000;
+const thermal = require('./thermal')('/dev/serial0', 19200);
+const qrResults = new Array();
 
 const opts = {
-    width: 1280,
-    height: 720,
-    //width:1920,
-    //height:1080,
-    //quality:50,
-    quality: 100,
+    //width: 1280,
+    //height: 720,
+    width: 1920,
+    height: 1080,
+    quality: 80,
+    //quality: 100,
     //Delay to take shot
     delay: 0,
     //Save shots in memory
@@ -36,18 +39,23 @@ exec('rm -rf *.jpg');
 //Creates webcam instance
 const Webcam = NodeWebcam.create(opts);
 
+//creates QR recognizer instance
+const qr = new QrCode();
+
 let previousImage = '';
 let processingPending = false;
-setInterval(process, 1000);
-
-const qr = new QrCode();
+setInterval(process, interval);
 
 qr.callback = function (error, result) {
     if (error) {
         console.log(`QR error: ${error}`);
         return;
     }
-    console.log(`QR success: ${JSON.stringify(result)}`);
+    if (!qrResults.includes(result.result)) {
+        qrResults.push(result.result);
+        console.log(`QR success: ${JSON.stringify(result)}`);
+        thermal.write(JSON.stringify(result));
+    }
 }
 
 function process() {
@@ -69,8 +77,6 @@ function process() {
                 if (err) {
                     console.log(err);
                 }
-
-
                 qr.decode({ width: img.width(), height: img.height() }, img._imgBuffer);
             });
         }

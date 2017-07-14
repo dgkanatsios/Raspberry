@@ -12,6 +12,7 @@
     "image-parser": "^1.2.4",
     "node-webcam": "^0.4.3",
     "qrcode-reader": "^1.0.2",
+    "serialport-stream": "^1.1.0",
     "uuid": "^3.1.0"
   }
 }
