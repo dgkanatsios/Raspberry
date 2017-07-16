@@ -17,7 +17,7 @@ function parsedht(value) {
 function postData(data) {
     return new Promise(function (resolve, reject) {
         data.credential = process.env.DEVICE_CREDENTIAL;
-        options.json = data;
+        options.json = JSON.stringify(data);
         request(options, function (error, response, body) {
             if(!error && response.statusCode === 200){
                 resolve();
