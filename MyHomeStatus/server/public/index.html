@@ -1,0 +1,25 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>My Home Status</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+    <script>
+        var host = window.location.hostname;
+        $(document).ready(function () {
+            $.getJSON('/latest', function (data) {
+                console.log(data);
+                $('#content').append(data);
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+    <div id='content'></div>
+</body>
+
+</html>

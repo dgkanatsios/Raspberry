@@ -1,4 +1,5 @@
 require('dotenv').config();
+const helpers = require('./helpers');
 const express = require('express'),
     app = express(),
     port = process.env.PORT || 3000,
@@ -6,16 +7,31 @@ const express = require('express'),
 
 
 const latesthandler = require('./latesthandler');
+const appendlatesthandler = require('./appendlatesthandler');
 
-
+app.use(express.static('public'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
 
 
-app.route("/new").post(function (req, res) {
-    latesthandler.uploadLatest(req.body).then(result => res.json(result)).catch(error => res.json(error));
+app.route('/new').post(function (req, res) {
+    try {
+        helpers.verifyRequestBody(req.body);
+        helpers.deleteCredentialProperty(req.body);
+        Promise.all([latesthandler.uploadLatest(req.body), appendlatesthandler.appendLatest(req.body)])
+            .then(results => res.json(results))
+            .catch(error => res.status(500).json(error));
+    } catch (e) {
+        res.status(400).json({
+            error: e.message
+        });
+    }
+});
+
+app.route('/latest').get(function (req, res) {
+    latesthandler.getLatest().then(result => res.json(result)).catch(error => res.status(500).json(error));
 });
 
 app.listen(port);

@@ -1,15 +1,20 @@
-function verifyConvertPostBody(body) {
+function verifyRequestBody(body) {
     if (!body.humidity || !body.temperature)
         throw new Error('body must have humidity and temperature');
-    return JSON.stringify(body);
+    if (!body.credential || body.credential !== process.env.DEVICE_CREDENTIAL)
+        throw new Error('wrong device credential');
 }
 
+function deleteCredentialProperty(body) {
+    Reflect.deleteProperty(body, 'credential');
+}
 
 const containerName = 'statuscontainer';
 const latestBlob = 'latest';
 
 module.exports = {
-    verifyConvertPostBody,
+    verifyRequestBody,
+    deleteCredentialProperty,
     containerName,
     latestBlob
 }

@@ -1,4 +1,5 @@
 'use strict';
+require('dotenv').config();
 const GrovePi = require('node-grovepi').GrovePi;
 const helpers = require('./helpers');
 
@@ -17,24 +18,25 @@ const board = new Board({
         if (res) {
             console.log('GrovePi Version :: ' + board.version())
 
-            var dhtsensor = new DHTDigitalSensor(3, DHTDigitalSensor.VERSION.DHT11, DHTDigitalSensor.CELSIUS);
+            const dhtsensor = new DHTDigitalSensor(3, DHTDigitalSensor.VERSION.DHT11, DHTDigitalSensor.CELSIUS);
             console.log('Temperature Sensor (start watch)');
             dhtsensor.on('change', function (res) {
                 const result = helpers.parsedht(res);
                 console.log('Temperature onChange value=' + JSON.stringify(result));
+                helpers.postData(JSON.stringify(result)).catch(err => console.log(err));
             })
-            dhtsensor.watch();
+            dhtsensor.watch(1000);
         }
     }
 })
 
 function onExit(err) {
-  console.log('ending');
-  board.close();
-  process.removeAllListeners();
-  process.exit();
-  if (typeof err != 'undefined')
-    console.log(err);
+    console.log('ending');
+    board.close();
+    process.removeAllListeners();
+    process.exit();
+    if (typeof err != 'undefined')
+        console.log(err);
 }
 
 
