@@ -23,8 +23,8 @@ const board = new Board({
             dhtsensor.on('change', function (res) {
                 console.log('Temperature onChange value (temp,hum,heatindex):' + res);
                 const result = helpers.parsedht(res);
-                if (result) { //if valid temperature
-                    helpers.postData(result).then(x=>console.log(x)).catch(err => console.log(err));
+                if (result !== null) { //if valid temperature
+                    helpers.postData(result).then(x => console.log(x)).catch(err => console.log(err));
                 }
             })
             dhtsensor.watch(1000);

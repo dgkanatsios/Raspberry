@@ -10,7 +10,7 @@ function parsedht(value) {
         if (element > 100 || element < -100) {
             isValid = false;
             return;
-        };
+        }
     }, this);
     if (isValid) {
         return {
@@ -18,7 +18,7 @@ function parsedht(value) {
             humidity: value[1],
             heatIndex: value[2] //https://en.wikipedia.org/wiki/Heat_index
         };
-    } else return undefined;
+    } else return null;
 
 }
 
