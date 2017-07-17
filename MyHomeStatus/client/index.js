@@ -3,10 +3,21 @@ require('dotenv').config();
 const GrovePi = require('node-grovepi').GrovePi;
 const helpers = require('./helpers');
 
-var Commands = GrovePi.commands;
-var Board = GrovePi.board;
-
+const GroveLCDRGBDisplay = require('./GroveLCDRGBDisplay');
 const DHTDigitalSensor = GrovePi.sensors.DHTDigital;
+const LightAnalogSensor = GrovePi.sensors.LightAnalog;
+
+const i2c = require('i2c-bus'),
+    i2c1 = i2c.openSync(1);
+let lcd = null;
+
+let dhtsensor = null;
+let lightsensor = null;
+
+const Commands = GrovePi.commands;
+const Board = GrovePi.board;
+
+const loopInterval = 1000 * 60;
 
 const board = new Board({
     debug: true,
@@ -18,22 +29,46 @@ const board = new Board({
         if (res) {
             console.log('GrovePi Version :: ' + board.version())
 
-            const dhtsensor = new DHTDigitalSensor(3, DHTDigitalSensor.VERSION.DHT11, DHTDigitalSensor.CELSIUS);
-            console.log('Temperature Sensor (start watch)');
-            dhtsensor.on('change', function (res) {
-                console.log('Temperature onChange value (temp,hum,heatindex):' + res);
-                const result = helpers.parsedht(res);
-                if (result !== null) { //if valid temperature
-                    helpers.postData(result).then(x => console.log(x)).catch(err => console.log(err));
-                }
-            })
-            dhtsensor.watch(1000);
+            dhtsensor = new DHTDigitalSensor(3, DHTDigitalSensor.VERSION.DHT11, DHTDigitalSensor.CELSIUS);
+            console.log('Temperature sensor initialized');
+
+            lcd = new GroveLCDRGBDisplay(i2c1);
+            lcd.setRGB(123, 98, 45);
+            console.log('RBG LCD initialized');
+
+            lightsensor = new LightAnalogSensor(0);
+            console.log('Light sensor initialized');
+
+            loop();
+            setInterval(loop,  loopInterval);
         }
     }
-})
+});
+
+
+function loop() {
+    const resTemp = dhtsensor.read();
+    const resLight = lightsensor.read();
+    console.log('Current light intensity:' + resLight);
+    if (resTemp) {
+        console.log('Current temperature  value (temp,hum,heatindex):' + resTemp);
+
+        const result = helpers.parsedht(resTemp);
+        if (result !== null) { //if valid temperature
+            result.light = resLight; //add light to the object
+            helpers.postData(result).then(x => console.log(x)).catch(err => console.log(err));
+        }
+        lcd.setText(`temp ${result.temperature},hum ${result.humidity},HI ${result.heatIndex},L ${result.light}`);
+
+    } else {
+        lcd.setText('error getting temperature');
+    }
+}
+
 
 function onExit(err) {
     console.log('ending');
+    lcd.turnOffDisplay();
     board.close();
     process.removeAllListeners();
     process.exit();
