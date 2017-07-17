@@ -21,9 +21,11 @@ const board = new Board({
             const dhtsensor = new DHTDigitalSensor(3, DHTDigitalSensor.VERSION.DHT11, DHTDigitalSensor.CELSIUS);
             console.log('Temperature Sensor (start watch)');
             dhtsensor.on('change', function (res) {
+                console.log('Temperature onChange value (temp,hum,heatindex):' + res);
                 const result = helpers.parsedht(res);
-                console.log('Temperature onChange value=' + JSON.stringify(result));
-                helpers.postData(result).catch(err => console.log(err));
+                if (result) { //if valid temperature
+                    helpers.postData(result).then(x=>console.log(x)).catch(err => console.log(err));
+                }
             })
             dhtsensor.watch(1000);
         }
