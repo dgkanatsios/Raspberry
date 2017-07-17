@@ -5,8 +5,10 @@ if (process.env.DEBUG)
     require('request').debug = true;
 
 function parsedht(value) {
-    if(!Number.isFinite(value[0]) || !Number.isFinite(value[1]) || !Number.isFinite(value[2]))
-        return undefined;
+    value.forEach(function (element) {
+        if (element > 100) return undefined;
+    }, this);
+
     return {
         temperature: value[0],
         humidity: value[1],
