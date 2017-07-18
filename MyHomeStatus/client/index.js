@@ -7,12 +7,15 @@ const GroveLCDRGBDisplay = require('./GroveLCDRGBDisplay');
 const DHTDigitalSensor = GrovePi.sensors.DHTDigital;
 const LightAnalogSensor = GrovePi.sensors.LightAnalog;
 
-const i2c = require('i2c-bus'),
-    i2c1 = i2c.openSync(1);
+const i2c = require('i2c-bus');
+const i2c1 = i2c.openSync(1);
 let lcd = null;
 
 let dhtsensor = null;
 let lightsensor = null;
+
+const leds = require('./leds');
+leds.turnBothLedsOff();
 
 const Commands = GrovePi.commands;
 const Board = GrovePi.board;
@@ -22,11 +25,13 @@ const loopInterval = 1000 * 60;
 const board = new Board({
     debug: true,
     onError: function (err) {
+        leds.changeRedStatus(true);
         console.log('Something wrong just happened');
         console.log(err);
     },
     onInit: function (res) {
         if (res) {
+            leds.changeGreenStatus(true);
             console.log('GrovePi Version :: ' + board.version())
 
             dhtsensor = new DHTDigitalSensor(3, DHTDigitalSensor.VERSION.DHT11, DHTDigitalSensor.CELSIUS);
@@ -52,7 +57,7 @@ function loop() {
     console.log('Current light intensity:' + resLight);
     if (resTemp) {
         console.log('Current temperature  value (temp,hum,heatindex):' + resTemp);
-
+        leds.changeGreenStatus(true);
         const result = helpers.parsedht(resTemp);
         if (result !== null) { //if valid temperature
             result.light = resLight; //add light to the object
@@ -60,12 +65,14 @@ function loop() {
             lcd.setText(`temp ${result.temperature},hum ${result.humidity},HI ${result.heatIndex},L ${result.light}`);
         }
     } else {
+        leds.changeRedStatus(true);
         lcd.setText('error getting temperature');
     }
 }
 
 
 function onExit(err) {
+    leds.turnBothLedsOff();
     console.log('ending');
     lcd.turnOffDisplay();
     board.close();
