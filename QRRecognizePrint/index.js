@@ -5,9 +5,31 @@ const QrCode = require('qrcode-reader');
 const fs = require('fs');
 const ImageParser = require('image-parser');
 const interval = 1000;
-const thermal = require('./thermal')('/dev/serial0', 19200);
 const qrResults = new Array();
 const deleteOldImages = false;
+//thermal printer
+//const printer = require('./thermal')('/dev/serial0', 19200);
+//zj58 USB printer
+const printer = require('./usbprinter')('zj58');
+
+function testApiCall() {
+    const apihelper = require('./apihelper');
+    const api = new apihelper(process.env.SERVER_URL);
+    api.getReservation('109841').then(res => {
+        //console.log(res.Result);
+        let toPrint;
+        res.Result.forEach(item => {
+            toPrint += item.Text;
+        });
+        printer.printText(toPrint);
+        process.exit();
+    }).catch(err => {
+        console.log(err);
+        process.exit();
+    });
+}
+
+
 
 const opts = {
     //width: 1280,
@@ -45,29 +67,29 @@ const qr = new QrCode();
 
 let previousImage = '';
 let processingPending = false;
-setInterval(process, interval);
+setInterval(captureProcessImage, interval);
 
 qr.callback = function (error, result) {
     if (error) {
         console.log(`QR error: ${error}`);
         return;
     }
+    //check if we have not already scanned this image
     if (!qrResults.includes(result.result)) {
-        qrResults.push(result.result);
+        qrResults.push(result.result); //save this result so we don't 'recognize' it again
         console.log(`QR success: ${JSON.stringify(result)}`);
-        thermal.write(JSON.stringify(result));
+        printer.printText(JSON.stringify(result));
     }
 }
 
-function process() {
+function captureProcessImage() {
     if (processingPending) return;
     processingPending = true;
 
     Webcam.capture(uuidv4(), function (err, data) {
         if (err) {
             console.log(err);
-        }
-        else {
+        } else {
             console.log(`image saved at ${data}`);
             if (previousImage != '' && deleteOldImages)
                 fs.unlinkSync(previousImage);
@@ -78,15 +100,12 @@ function process() {
                 if (err) {
                     console.log(err);
                 }
-                qr.decode({ width: img.width(), height: img.height() }, img._imgBuffer);
+                qr.decode({
+                    width: img.width(),
+                    height: img.height()
+                }, img._imgBuffer);
             });
         }
         processingPending = false;
     });
 }
-
-
-
-
-
-

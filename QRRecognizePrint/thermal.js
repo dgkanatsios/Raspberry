@@ -36,10 +36,10 @@ var DC4 = 20
 var ESC = 27
 var GS = 29
 
-module.exports = exports = Thermal
-inherits(Thermal, WritableStream)
+
+inherits(Thermal, WritableStream);
 function Thermal(port, baud) {
-    if (!(this instanceof Thermal)) return new Thermal(port, baud)
+    if (!(this instanceof Thermal)) return new Thermal(port, baud);
 
     WritableStream.call(this)
 
@@ -52,7 +52,7 @@ function Thermal(port, baud) {
     this.sleep()
 }
 
-Thermal.prototype.write = function (chunk, encoding, callback) {
+Thermal.prototype.printText = function (chunk, encoding, callback) {
     var self = this
     function write(chunk) {
         WritableStream.prototype.write.apply(self, arguments)
@@ -161,3 +161,5 @@ Thermal.prototype.writeBarcode = function (code, type) {
     this.write(new Buffer([GS, ord('k'), index]))
     return this.write(code + '\0')
 }
+
+module.exports = exports = Thermal;
