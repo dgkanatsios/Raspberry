@@ -40,7 +40,7 @@ const board = new Board({
             console.log('Light sensor initialized');
 
             loop();
-            setInterval(loop,  loopInterval);
+            setInterval(loop, loopInterval);
         }
     }
 });
@@ -57,9 +57,8 @@ function loop() {
         if (result !== null) { //if valid temperature
             result.light = resLight; //add light to the object
             helpers.postData(result).then(x => console.log(x)).catch(err => console.log(err));
+            lcd.setText(`temp ${result.temperature},hum ${result.humidity},HI ${result.heatIndex},L ${result.light}`);
         }
-        lcd.setText(`temp ${result.temperature},hum ${result.humidity},HI ${result.heatIndex},L ${result.light}`);
-
     } else {
         lcd.setText('error getting temperature');
     }
