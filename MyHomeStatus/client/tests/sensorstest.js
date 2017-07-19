@@ -1,6 +1,5 @@
 const GrovePi = require('node-grovepi').GrovePi;
-const Commands = GrovePi.commands
-const Board = GrovePi.board
+const Board = GrovePi.board;
 
 const sensors = require('../sensors');
 
@@ -15,14 +14,13 @@ function start() {
     board = new Board({
         debug: true,
         onError: function (err) {
-            console.log('TEST ERROR');
-            console.log(err);
+            console.log('test error:' + err);
         },
         onInit: function (res) {
             if (res) {
                 loudness = new sensors.SoundAnalogSensor(2, 5);
                 loudness.start();
-                //setInterval(soundLoop, 1000);
+                setInterval(soundLoop, 1000);
 
                 rotaryAngle = new sensors.RotaryAngleSensor(1);
                 rotaryAngle.on('change', function (res) {
@@ -37,7 +35,7 @@ function start() {
                 button.watch(10);
 
             } else {
-                console.log('TEST CANNOT START');
+                console.log('Error: test cannot start, problem in the board?');
             }
         }
     })

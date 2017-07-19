@@ -47,11 +47,11 @@ let previousValue = -100;
 
 function handleRotaryChange(value) {
     //value is 0..100
-
+    //ignore minor differences - could be noise...
     let diff = Math.abs(value - previousValue);
-    if (diff == 0 || diff == 1)
+    if (diff <= 2)
         return;
-    else { //value change
+    else { //value change occurred
         previousValue = value;
         api.groups().then(result => {
             //get the group we're interested

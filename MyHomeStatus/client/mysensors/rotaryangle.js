@@ -1,7 +1,7 @@
 const AnalogSensor = require('node-grovepi').GrovePi.sensors.base.Analog;
 const helpers = require('../helpers');
 
-function RotaryAngleSensor(pin, sps) {
+function RotaryAngleSensor(pin) {
     AnalogSensor.apply(this, Array.prototype.slice.call(arguments));
 }
 RotaryAngleSensor.prototype = new AnalogSensor();
