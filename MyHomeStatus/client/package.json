@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node tests/basictest.js"
+    "test": "node tests/sensorstest.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +13,7 @@
   "dependencies": {
     "i2c-bus": "^1.2.2",
     "node-grovepi": "^2.1.1",
+    "node-hue-api": "^2.4.2",
     "request": "^2.81.0",
     "sleep": "^5.1.1"
   },

@@ -22,6 +22,13 @@ function parsedht(value) {
 
 }
 
+function round(number, precision) {
+    var factor = Math.pow(10, precision);
+    var tempNumber = number * factor;
+    var roundedTempNumber = Math.round(tempNumber);
+    return roundedTempNumber / factor;
+};
+
 function postData(data) {
     return new Promise(function (resolve, reject) {
         data.credential = process.env.DEVICE_CREDENTIAL;
@@ -45,5 +52,6 @@ function postData(data) {
 
 module.exports = {
     parsedht,
-    postData
+    postData,
+    round
 }

@@ -10,3 +10,5 @@ export SERVER_URL=<your url>
 chmod +x start.sh
 ./start.sh
 ```
+
+If you want to use Hue related sensors, do not forget to set HUE_HOST and HUE_USER environmental variables.

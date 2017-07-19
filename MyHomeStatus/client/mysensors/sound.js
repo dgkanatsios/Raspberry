@@ -1,5 +1,5 @@
 const AnalogSensor = require('node-grovepi').GrovePi.sensors.base.Analog;
-
+const helpers = require('../helpers');
 
 function SoundAnalogSensor(pin, sps) {
   AnalogSensor.apply(this, Array.prototype.slice.call(arguments));
@@ -19,10 +19,10 @@ SoundAnalogSensor.prototype.read = function () {
 
   let sum = this.results.reduce(
     (acc, cur) => acc + cur, 0);
-  
+
   let result = sum / this.results.length;
   this.results.length = 0;
-  return Math.round(result * 100) / 100;
+  return helpers.round(result, 2);
 }
 
 SoundAnalogSensor.prototype.start = function () {

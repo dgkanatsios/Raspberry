@@ -4,8 +4,10 @@ const Board = GrovePi.board
 
 const sensors = require('../sensors');
 
-let board;
+let board = null;
 let loudness = null;
+let rotaryAngle = null;
+let button = null;
 
 function start() {
     console.log('starting')
@@ -20,7 +22,20 @@ function start() {
             if (res) {
                 loudness = new sensors.SoundAnalogSensor(2, 5);
                 loudness.start();
-                setInterval(soundLoop, 1000);
+                //setInterval(soundLoop, 1000);
+
+                rotaryAngle = new sensors.RotaryAngleSensor(1);
+                rotaryAngle.on('change', function (res) {
+                    console.log('Rotary value: ' + res);
+                });
+                rotaryAngle.watch();
+
+                button = new sensors.ButtonSensor(4);
+                button.on('change', function (res) {
+                    console.log('Button value: ' + res);
+                });
+                button.watch(10);
+
             } else {
                 console.log('TEST CANNOT START');
             }
@@ -33,7 +48,7 @@ function start() {
 function soundLoop() {
     if (!loudness) throw Error('you need to initialize the sensor');
     let res = loudness.read();
-    console.log('Sound value=' + res);
+    console.log('Sound value: ' + res);
 }
 
 function onExit(err) {

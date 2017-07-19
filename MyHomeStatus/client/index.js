@@ -12,7 +12,9 @@ let lightsensor = null;
 let soundsensor = null;
 
 const sensors = require('./sensors');
+const huehandler = require('./hue/huehandler');
 
+const deviceID = 1;
 
 const Commands = GrovePi.commands;
 const Board = GrovePi.board;
@@ -43,6 +45,9 @@ const board = new Board({
             soundsensor.start();
             console.log('Sound sensor initialized');
 
+            huehandler.start();
+            console.log('Hue handler initialized');
+
             loop();
             setInterval(loop, loopInterval);
         }
@@ -63,9 +68,10 @@ function loop() {
         const result = helpers.parsedht(resTemp);
         if (result !== null) { //if valid temperature
 
-            //add light and sound to the object
+            //add rest of the properties
             result.light = resLight; 
             result.sound = resSound;
+            result.deviceID = deviceID;
             
             helpers.postData(result).then(response => console.log(response)).catch(err => handleError(err));
             lcd.setText(`temp ${result.temperature},hum ${result.humidity},HI ${result.heatIndex},L ${result.light}`);
@@ -82,10 +88,13 @@ function handleError(err) {
 }
 
 function onExit(err) {
-    clearInterval(loop);
     console.log('ending');
+
+    clearInterval(loop);
+        
     sensors.leds.changeRedStatus(false);
     lcd.turnOffDisplay();
+
     board.close();
     process.removeAllListeners();
     process.exit();
