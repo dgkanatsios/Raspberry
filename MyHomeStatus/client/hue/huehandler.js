@@ -31,44 +31,53 @@ const api = new HueApi(host, username);
 
 const start = function () {
     rotarySensor = new sensors.RotaryAngleSensor(1);
-    rotarySensor.on('change', handleRotaryChange);
-    rotarySensor.watch();
+    rotarySensor.start();
+    rotarySensor.on('data', function (res) {
+        handleRotaryAngle(res);
+    });
 
     button = new sensors.ButtonSensor(4);
-    button.on('change', function (res) {
-        if (res === 1) { //ignore zeros
+    button.on('down', function (arg) {
+        if (arg === 'singlepress') {
             changeScene();
+        } else if (arg === 'longpress') {
+            turnLightsOnOff();
         }
     });
     button.watch();
 }
 
-let previousValue = -100;
 
-function handleRotaryChange(value) {
-    //value is 0..100
-    //ignore minor differences - could be noise...
-    let diff = Math.abs(value - previousValue);
-    if (diff <= 2)
-        return;
-    else { //value change occurred
-        previousValue = value;
-        api.groups().then(result => {
-            //get the group we're interested
-            let group = result.filter(x => x.id === groupID.toString())[0];
-            if (group.state.all_on) {
-                let state = lightState.create().brightness(value);
-                api.setGroupLightState(groupID, state).then(handleBrightnessChangeResult).catch(err=>console.log(err)).done();
-            }
-        }).done();
-    }
+function handleRotaryAngle(value) {
+    api.groups().then(result => {
+        //get the group we're interested
+        let group = result.filter(x => x.id === groupID.toString())[0];
+        if (group.state.all_on) {
+            let state = lightState.create().brightness(value);
+            api.setGroupLightState(groupID, state).then(handleBrightnessChangeResult).catch(err => console.log(err)).done();
+        }
+    }).done();
 }
 
 function changeScene() {
     let sceneToActivate = scenes[sceneIndex++];
     if (sceneIndex === scenes.length)
         sceneIndex = 0;
-    api.activateScene(sceneToActivate).then(handleSceneChangeResult).catch(err=>console.log(err)).done();
+    api.activateScene(sceneToActivate).then(handleSceneChangeResult).catch(err => console.log(err)).done();
+}
+
+function turnLightsOnOff() {
+    api.groups().then(result => {
+        //get the group we're interested
+        let group = result.filter(x => x.id === groupID.toString())[0];
+        let state;
+        if (group.state.all_on) {
+            state = lightState.create().off();
+        } else {
+            state = lightState.create().on();
+        }
+        api.setGroupLightState(groupID, state).catch(err => console.log(err)).done();
+    }).done();
 }
 
 module.exports = {

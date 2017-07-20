@@ -1,42 +1,42 @@
 const AnalogSensor = require('node-grovepi').GrovePi.sensors.base.Analog;
 const helpers = require('../helpers');
 
-function SoundAnalogSensor(pin, sps) {
+function LoudnessSensor(pin, samplespersecond) {
   AnalogSensor.apply(this, Array.prototype.slice.call(arguments));
-  this.samplespersecond = sps || 5;
+  this.samplespersecond = samplespersecond || 5;
   this.results = new Array();
   this.samples = 0;
 }
-SoundAnalogSensor.prototype = new AnalogSensor();
+LoudnessSensor.prototype = new AnalogSensor();
 
-SoundAnalogSensor.prototype.readCurrent = function () {
+LoudnessSensor.prototype.readCurrent = function () {
   return AnalogSensor.prototype.read.call(this);
 }
 
-SoundAnalogSensor.prototype.read = function () {
+LoudnessSensor.prototype.read = function () {
   if (this.results.length == 0)
     throw new Error('no results. Did you call start()?');
 
-  let sum = this.results.reduce(
-    (acc, cur) => acc + cur, 0);
+  let sum = this.results.reduce((acc, cur) => acc + cur, 0);
 
   let result = sum / this.results.length;
-  this.results.length = 0;
+  this.results = new Array();
   return helpers.round(result, 2);
 }
 
-SoundAnalogSensor.prototype.start = function () {
+LoudnessSensor.prototype.start = function () {
   loop.bind(this)();
   setInterval(loop.bind(this), 1000 / this.samplespersecond);
 }
 
-SoundAnalogSensor.prototype.stop = function () {
+LoudnessSensor.prototype.stop = function () {
   clearInterval(loop);
 }
 
 function loop() {
+  this.readCurrent();
   let currentResult = this.readCurrent();
   this.results.push(currentResult);
 }
 
-module.exports = SoundAnalogSensor;
+module.exports = LoudnessSensor;

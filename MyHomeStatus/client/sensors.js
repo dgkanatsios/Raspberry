@@ -2,10 +2,10 @@ const GrovePi = require('node-grovepi').GrovePi;
 
 module.exports = {
     GroveLCDRGBDisplay: require('./mysensors/GroveLCDRGBDisplay'),
-    leds: require('./mysensors/leds'),
-    SoundAnalogSensor: require('./mysensors/sound'),
+    Leds: require('./mysensors/leds'),
+    LoudnessSensor: require('./mysensors/LoudnessSensor'),
     DHTDigitalSensor: GrovePi.sensors.DHTDigital,
     LightAnalogSensor: GrovePi.sensors.LightAnalog,
-    RotaryAngleSensor: require('./mysensors/rotaryangle'),
-    ButtonSensor: GrovePi.sensors.DigitalInput
+    RotaryAngleSensor: require('./mysensors/RotaryAngleSensor'),
+    ButtonSensor: require('./mysensors/DigitalButton')
 }
