@@ -5,7 +5,8 @@ module.exports = {
     Leds: require('./mysensors/leds'),
     LoudnessSensor: require('./mysensors/LoudnessSensor'),
     DHTDigitalSensor: GrovePi.sensors.DHTDigital,
-    LightAnalogSensor: GrovePi.sensors.LightAnalog,
+    CustomLightAnalogSensor: require('./mysensors/CustomLightAnalogSensor'),
     RotaryAngleSensor: require('./mysensors/RotaryAngleSensor'),
     ButtonSensor: require('./mysensors/DigitalButton')
+
 }

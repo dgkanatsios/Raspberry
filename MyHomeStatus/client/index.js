@@ -32,14 +32,14 @@ const board = new Board({
         if (res) {
             console.log('GrovePi Version :: ' + board.version())
             sensors.Leds.changeRedStatus(false);
-            dhtsensor = new sensors.DHTDigitalSensor(3, sensors.DHTDigitalSensor.VERSION.DHT11, sensors.DHTDigitalSensor.CELSIUS);
+            dhtsensor = new sensors.DHTDigitalSensor(3, sensors.DHTDigitalSensor.VERSION.DHT22, sensors.DHTDigitalSensor.CELSIUS);
             console.log('Temperature sensor initialized');
 
             lcd = new sensors.GroveLCDRGBDisplay(i2c1);
             lcd.setRGB(123, 98, 45);
             console.log('RBG LCD initialized');
 
-            lightsensor = new sensors.LightAnalogSensor(0);
+            lightsensor = new sensors.CustomLightAnalogSensor(0);
             console.log('Light sensor initialized');
 
             loudnessSensor = new sensors.LoudnessSensor(2, 5);
@@ -61,7 +61,7 @@ function loop() {
     if (DEBUG) console.log('Current light intensity:' + resLight);
 
     const resLoudness = loudnessSensor.read();
-    if (DEBUG) console.log('Current sound value:' + resLoudness);
+    if (DEBUG) console.log(`Current avg sound value: ${resLoudness.avg}, max: ${resLoudness.max}`);
 
     const resTemp = dhtsensor.read();
     if (resTemp) {
@@ -70,12 +70,13 @@ function loop() {
         if (result !== null) { //if valid temperature
 
             //add rest of the properties
-            result.light = resLight;
-            result.sound = resLoudness;
+            result.light = resLight || 'N/A';
+            result.soundAvg = resLoudness.avg;
+            result.soundMax = resLoudness.max;
             result.deviceID = deviceID;
 
             helpers.postData(result).then(response => console.log(response)).catch(err => handleError(err));
-            lcd.setText(`temp ${result.temperature},hum ${result.humidity},HI ${result.heatIndex},L ${result.light}`);
+            lcd.setText(`T${helpers.round(result.temperature,1)},H${helpers.round(result.humidity,1)},HI${helpers.round(result.heatIndex,1)},L${helpers.round(result.light,1)},S${helpers.round(result.soundAvg,1)}`);
         }
     } else {
         handleError('error getting temperature');

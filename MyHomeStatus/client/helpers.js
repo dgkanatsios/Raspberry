@@ -23,7 +23,10 @@ function parsedht(value) {
 }
 
 function round(number, precision) {
-    var factor = Math.pow(10, precision);
+    if(isNaN(number)) return 'N/A';
+    
+    let prec = precision || 2;
+    var factor = Math.pow(10, prec);
     var tempNumber = number * factor;
     var roundedTempNumber = Math.round(tempNumber);
     return roundedTempNumber / factor;

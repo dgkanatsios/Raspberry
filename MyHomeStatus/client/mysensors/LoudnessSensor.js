@@ -5,7 +5,6 @@ function LoudnessSensor(pin, samplespersecond) {
   AnalogSensor.apply(this, Array.prototype.slice.call(arguments));
   this.samplespersecond = samplespersecond || 5;
   this.results = new Array();
-  this.samples = 0;
 }
 LoudnessSensor.prototype = new AnalogSensor();
 
@@ -18,10 +17,19 @@ LoudnessSensor.prototype.read = function () {
     throw new Error('no results. Did you call start()?');
 
   let sum = this.results.reduce((acc, cur) => acc + cur, 0);
+  let avg = sum / this.results.length;
 
-  let result = sum / this.results.length;
+  let max = this.results.reduce(function (a, b) {
+    return Math.max(a, b);
+  });
+
+  //reset the array
   this.results = new Array();
-  return helpers.round(result, 2);
+
+  return {
+    avg: helpers.round(avg, 2),
+    max: helpers.round(max, 2)
+  };
 }
 
 LoudnessSensor.prototype.start = function () {
@@ -34,7 +42,6 @@ LoudnessSensor.prototype.stop = function () {
 }
 
 function loop() {
-  this.readCurrent();
   let currentResult = this.readCurrent();
   this.results.push(currentResult);
 }
