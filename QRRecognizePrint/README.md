@@ -4,11 +4,11 @@
 
 * Get a webcam
 
-For my tests I used Microsoft Lifecam Cinema
+Initially, we used Microsoft Lifecam Cinema. However, a Raspberry Pi Camera v2 works much better!
 
 * Get a thermal printer
 
-I used [this](https://www.adafruit.com/product/597) one
+We used [this](https://www.adafruit.com/product/597) one
 
 * Connect and install printer
 
@@ -18,17 +18,18 @@ Check the instructions [here](http://scruss.com/blog/2015/07/12/thermal-printer-
 
 * Set $SERVER_URL
 
-* Install fswebcam
+* Install zbar
+
 ```bash
-sudo apt-get install fswebcam
+sudo apt-get update && sudo apt-get install zbar-tools
 ```
 
-* Install GraphicsMagick
+* Modify /etc/rc.local to make /dev/video0 accessible
 
-Install this if [lwip](https://github.com/EyalAr/lwip) installation fails during npm install
 ```bash
-sudo apt-get install graphicsmagick
+sudo modprobe bcm2835-v4l2
 ```
+
 * Install Node.js
 ```bash
 sudo wget -O - https://raw.githubusercontent.com/audstanley/NodeJs-Raspberry-Pi/master/Install-Node.sh | sudo bash;
@@ -38,8 +39,8 @@ sudo wget -O - https://raw.githubusercontent.com/audstanley/NodeJs-Raspberry-Pi/
 npm install
 ```
 
-* Run the app
+* Install forever
 ```bash
-node index
+npm install -g forever
 ```
 
