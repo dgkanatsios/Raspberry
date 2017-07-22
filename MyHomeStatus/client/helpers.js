@@ -1,5 +1,5 @@
 'use strict';
-const request = require('request');
+const request = require('requestretry');
 
 if (process.env.DEBUG)
     require('request').debug = true;
@@ -23,8 +23,8 @@ function parsedht(value) {
 }
 
 function round(number, precision) {
-    if(isNaN(number)) return 'N/A';
-    
+    if (isNaN(number)) return 'N/A';
+
     let prec = precision || 2;
     var factor = Math.pow(10, prec);
     var tempNumber = number * factor;
@@ -39,7 +39,10 @@ function postData(data) {
         const options = {
             uri: `${process.env.SERVER_URL}/new`,
             method: 'POST',
-            json: data
+            json: data,
+            maxAttempts: 3, // (default) try 3 times
+            retryDelay: 10000, // (default) wait for 10s before trying again
+            retryStrategy: request.RetryStrategies.HTTPOrNetworkError // (default) retry on 5xx or network errors
         };
 
         request(options, function (error, response, body) {
