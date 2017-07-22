@@ -60,7 +60,7 @@ function loop() {
     const resLight = lightsensor.read();
     if (DEBUG) console.log('Current light intensity:' + resLight);
 
-    const resLoudness = loudnessSensor.read();
+    const resLoudness = loudnessSensor.readAvgMax();
     if (DEBUG) console.log(`Current avg sound value: ${resLoudness.avg}, max: ${resLoudness.max}`);
 
     const resTemp = dhtsensor.read();

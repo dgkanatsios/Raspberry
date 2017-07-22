@@ -30,7 +30,7 @@ function round(number, precision) {
     var tempNumber = number * factor;
     var roundedTempNumber = Math.round(tempNumber);
     return roundedTempNumber / factor;
-};
+}
 
 function postData(data) {
     return new Promise(function (resolve, reject) {

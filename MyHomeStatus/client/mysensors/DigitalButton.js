@@ -10,9 +10,9 @@ let mode = buttonMode.UP; //not pressed
 
 let datetimePressed;
 
-function DigitalButton(pin, watchDelay) {
+function DigitalButton(pin, longpressDelay) {
     DigitalInput.apply(this, Array.prototype.slice.call(arguments));
-    let wd = watchDelay || 10;
+    longpressDelay = longpressDelay || 1100
     this.on('change', function (res) {
         //user presses the button for the first time
         if (res == 1 && mode === buttonMode.UP) {
@@ -27,8 +27,8 @@ function DigitalButton(pin, watchDelay) {
         } else { //res == 0 so user has lifted her finger
             let currentDateTime = new Date();
             let miliseconds = currentDateTime.getTime() - datetimePressed.getTime();
-            //if less than 1.1 seconds
-            if (miliseconds <= 1100) {
+            //if less than longgpressDelay miliseconds
+            if (miliseconds <= longpressDelay) {
                 this.emit('down', 'singlepress');
             } else {
                 this.emit('down', 'longpress');
@@ -37,8 +37,8 @@ function DigitalButton(pin, watchDelay) {
             mode = buttonMode.UP;
         }
     });
-    this.watch(wd);
 }
+
 DigitalButton.prototype = new DigitalInput();
 
 module.exports = DigitalButton;

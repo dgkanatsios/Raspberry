@@ -8,11 +8,7 @@ function LoudnessSensor(pin, samplespersecond) {
 }
 LoudnessSensor.prototype = new AnalogSensor();
 
-LoudnessSensor.prototype.readCurrent = function () {
-  return AnalogSensor.prototype.read.call(this);
-}
-
-LoudnessSensor.prototype.read = function () {
+LoudnessSensor.prototype.readAvgMax = function () {
   if (this.results.length == 0)
     throw new Error('no results. Did you call start()?');
 
@@ -42,7 +38,7 @@ LoudnessSensor.prototype.stop = function () {
 }
 
 function loop() {
-  let currentResult = this.readCurrent();
+  let currentResult = this.read();
   this.results.push(currentResult);
 }
 

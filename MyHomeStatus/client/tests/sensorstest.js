@@ -11,11 +11,11 @@ let board = null,
 let button = null;
 
 const options = {
-    testRotary: false,
+    testRotary: true,
     testLoudness: true,
-    testButton: false,
+    testButton: true,
     testDHT: false,
-    testLightAnalog: true
+    testLightAnalog: false
 }
 
 function start() {
@@ -31,7 +31,7 @@ function start() {
                 if (options.testLoudness) {
                     loudness = new sensors.LoudnessSensor(2, 5);
                     loudness.start();
-                    setInterval(loudnessLoop, 1000);
+                    setInterval(loudnessLoop, 10000);
                 }
 
                 if (options.testRotary) {
@@ -47,6 +47,7 @@ function start() {
                     button.on('down', function (res) {
                         console.log('Button down: ' + res);
                     });
+                    button.watch();
                 }
 
                 if(options.testDHT){
@@ -70,13 +71,8 @@ function start() {
 
 function loudnessLoop() {
     if (!loudness) throw Error('you need to initialize the sensor');
-    let res = loudness.read();
+    let res = loudness.readAvgMax();
     console.log(`Current avg sound value: ${res.avg}, max: ${res.max}`);
-}
-
-function rotaryloop() {
-    let res = rotaryAngle.read();
-    console.log('Rotary angle: ' + res);
 }
 
 function dhtLoop(){
@@ -95,7 +91,6 @@ function onExit(err) {
 
     clearInterval(dhtLoop);
     clearInterval(loudnessLoop);
-    clearInterval(rotaryloop);
     clearInterval(lightanalogLoop);
     if(options.testLoudness) loudness.stop();
     if(options.testRotary) rotaryAngle.stop();

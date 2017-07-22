@@ -12,7 +12,7 @@ RotaryAngleSensor.prototype = new AnalogSensor();
 
 RotaryAngleSensor.prototype.read = function () {
     let value = AnalogSensor.prototype.read.call(this);
-    
+
     let degrees = convertDHTToDegrees(value);
 
     //Calculate result (0 to 100) from degrees(0 to 300)
@@ -25,7 +25,7 @@ const convertDHTToDegrees = function (value) {
     //http://wiki.seeed.cc/Grove-Rotary_Angle_Sensor/
     let adc_ref = 5;
     let grove_vcc = 5;
-  
+
     let voltage = helpers.round((value) * adc_ref / 1023, 2);
 
     //Calculate rotation in degrees(0 to 300)
@@ -44,6 +44,8 @@ RotaryAngleSensor.prototype.stop = function () {
 let temp = Array.apply(null, Array(101)).map(Number.prototype.valueOf, 0); //0..100
 let timesRun = 0;
 
+let previousData = null;
+
 function loop() {
     const reading = this.read();
     if (reading < 0 || reading > 100) throw new Error('improper reading');
@@ -55,7 +57,13 @@ function loop() {
         timesRun = 0;
         //reset the array
         temp = Array.apply(null, Array(101)).map(Number.prototype.valueOf, 0);
-        this.emit('data', result);
+        
+        //compare current data to previous data
+        if (Math.abs(result - previousData) != 0) {
+            //there are new data
+            this.emit('data', result);
+            previousData = result;
+        }
     }
 }
 
