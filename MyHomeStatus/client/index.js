@@ -18,7 +18,6 @@ const huehandler = require('./hue/huehandler');
 
 const deviceID = 1;
 
-const Commands = GrovePi.commands;
 const Board = GrovePi.board;
 
 const loopInterval = 1000 * 60;
@@ -86,7 +85,7 @@ function loop() {
             result.deviceID = deviceID;
 
             helpers.postData(result).then(response => console.log(response)).catch(err => handleError(err));
-            lcd.setText(`T${helpers.round(result.temperature,1)},H${helpers.round(result.humidity,1)},HI${helpers.round(result.heatIndex,1)},L${helpers.round(result.light,1)},S${helpers.round(result.soundAvg,1)},D${helpers.round(result.dustAvg),1}`);
+            lcd.setText(`T${helpers.round(result.temperature,1)},H${helpers.round(result.humidity,1)},HI${helpers.round(result.heatIndex,1)},L${helpers.round(result.light,0)},S${helpers.round(result.soundAvg,0)},D${helpers.round(result.dustAvg),1}`);
         }
     } else {
         handleError('error getting temperature');
