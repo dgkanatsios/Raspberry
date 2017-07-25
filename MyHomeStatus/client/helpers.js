@@ -23,7 +23,7 @@ function parsedht(value) {
 }
 
 function round(number, precision) {
-    if (isNaN(number)) return 'N/A';
+    if (isNaN(number)) return NOT_AVAILABLE;
 
     let prec = precision || 2;
     var factor = Math.pow(10, prec);
@@ -56,8 +56,11 @@ function postData(data) {
     });
 }
 
+const NOT_AVAILABLE = 'N/A';
+
 module.exports = {
     parsedht,
     postData,
-    round
+    round,
+    NOT_AVAILABLE
 }

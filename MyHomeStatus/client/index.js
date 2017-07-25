@@ -10,7 +10,8 @@ const i2c1 = i2c.openSync(1);
 let dhtsensor = null,
     lightsensor = null,
     loudnessSensor = null,
-    lcd = null;
+    lcd = null,
+    dust = null;
 
 const sensors = require('./sensors');
 const huehandler = require('./hue/huehandler');
@@ -46,6 +47,10 @@ const board = new Board({
             loudnessSensor.start();
             console.log('Loudness sensor initialized');
 
+            dust = new sensors.DustSensor(2);
+            dust.start();
+            console.log('Dust sensor initialized');
+
             huehandler.start();
             console.log('Hue handler initialized');
 
@@ -63,6 +68,9 @@ function loop() {
     const resLoudness = loudnessSensor.readAvgMax();
     if (DEBUG) console.log(`Current avg sound value: ${resLoudness.avg}, max: ${resLoudness.max}`);
 
+    const resDust = dust.readAvgMax();
+    if(DEBUG) console.log(`Current dust concentration value: ${resDust.avg}, max: ${resDust.max}`);
+
     const resTemp = dhtsensor.read();
     if (resTemp) {
         if (DEBUG) console.log('Current temperature  value (temp,hum,heatindex):' + resTemp);
@@ -70,13 +78,15 @@ function loop() {
         if (result !== null) { //if valid temperature
 
             //add rest of the properties
-            result.light = resLight || 'N/A';
+            result.light = resLight || helpers.NOT_AVAILABLE;
             result.soundAvg = resLoudness.avg;
             result.soundMax = resLoudness.max;
+            result.dustAvg = resDust.avg;
+            result.dustMax = resDust.max;
             result.deviceID = deviceID;
 
             helpers.postData(result).then(response => console.log(response)).catch(err => handleError(err));
-            lcd.setText(`T${helpers.round(result.temperature,1)},H${helpers.round(result.humidity,1)},HI${helpers.round(result.heatIndex,1)},L${helpers.round(result.light,1)},S${helpers.round(result.soundAvg,1)}`);
+            lcd.setText(`T${helpers.round(result.temperature,1)},H${helpers.round(result.humidity,1)},HI${helpers.round(result.heatIndex,1)},L${helpers.round(result.light,1)},S${helpers.round(result.soundAvg,1)},D${helpers.round(result.dustAvg),1}`);
         }
     } else {
         handleError('error getting temperature');

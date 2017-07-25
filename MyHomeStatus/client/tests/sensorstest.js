@@ -7,15 +7,17 @@ let board = null,
     loudness = null,
     dhtsensor = null,
     lightAnalog = null,
-    rotaryAngle = null;
+    rotaryAngle = null,
+    dust = null;
 let button = null;
 
 const options = {
-    testRotary: true,
-    testLoudness: true,
-    testButton: true,
+    testRotary: false,
+    testLoudness: false,
+    testButton: false,
     testDHT: false,
-    testLightAnalog: false
+    testLightAnalog: false,
+    testDust: true
 }
 
 function start() {
@@ -50,14 +52,20 @@ function start() {
                     button.watch();
                 }
 
-                if(options.testDHT){
+                if (options.testDHT) {
                     dhtsensor = new sensors.DHTDigitalSensor(3, sensors.DHTDigitalSensor.VERSION.DHT22, sensors.DHTDigitalSensor.CELSIUS);
                     setInterval(dhtLoop, 200);
                 }
 
-                if(options.testLightAnalog){
+                if (options.testLightAnalog) {
                     lightAnalog = new sensors.CustomLightAnalogSensor(0);
                     setInterval(lightanalogLoop, 200);
+                }
+
+                if (options.testDust) {
+                    dust = new sensors.DustSensor(2);
+                    dust.start();
+                    setInterval(dustLoop, 30 * 1000);
                 }
 
             } else {
@@ -75,15 +83,22 @@ function loudnessLoop() {
     console.log(`Current avg sound value: ${res.avg}, max: ${res.max}`);
 }
 
-function dhtLoop(){
+function dhtLoop() {
     let res = dhtsensor.read();
     let resTemp = helpers.parsedht(res);
     console.log('Current temperature  value (temp,hum,heatindex):' + JSON.stringify(resTemp));
 }
 
-function lightanalogLoop(){
+function lightanalogLoop() {
     let res = lightAnalog.read();
     console.log('Current light value:' + res);
+}
+
+function dustLoop() {
+    if (!dust) throw Error('you need to initialize the sensor');
+    
+    let res = dust.readAvgMax();
+    console.log(`Current avg concentration ${res.avg} and max: ${res.max} pcs/0.01cf`);
 }
 
 function onExit(err) {
@@ -92,8 +107,11 @@ function onExit(err) {
     clearInterval(dhtLoop);
     clearInterval(loudnessLoop);
     clearInterval(lightanalogLoop);
-    if(options.testLoudness) loudness.stop();
-    if(options.testRotary) rotaryAngle.stop();
+    clearInterval(dustLoop);
+
+    if (options.testLoudness) loudness.stop();
+    if (options.testRotary) rotaryAngle.stop();
+    if(options.testDust) dust.stop();
 
     board.close();
     process.removeAllListeners();
