@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-printer": "^1.0.2",
+    "printer": "^0.2.2",
     "request": "^2.81.0",
     "serialport-stream": "^1.1.0",
     "zbar": "0.0.4"
