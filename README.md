@@ -15,8 +15,3 @@ http://dgkanatsios.com/2016/03/09/raspberry-pi-sense-hat-azure-iot-hub-oh-my/
 
 ## QRRecognizePrint
 Make a Raspberry PI recognize a QR code and print information on a connected thermal printer, like [this](https://www.adafruit.com/product/597) one.
-
-
-## MyHomeStatus
-
-A work-in-progress utility that monitors home temperature and humidity using GrovePi and Raspberry PI and uploads them to Azure Storage.
