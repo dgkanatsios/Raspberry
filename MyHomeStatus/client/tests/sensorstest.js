@@ -8,7 +8,10 @@ let board = null,
     dhtsensor = null,
     lightAnalog = null,
     rotaryAngle = null,
-    dust = null;
+    dust = null,
+    motion = null,
+    buzzer = null;
+
 let button = null;
 
 const options = {
@@ -17,7 +20,9 @@ const options = {
     testButton: false,
     testDHT: false,
     testLightAnalog: false,
-    testDust: true
+    testDust: true,
+    testMotion: true,
+    testBuzzerOnMotion: false
 }
 
 function start() {
@@ -37,7 +42,7 @@ function start() {
                 }
 
                 if (options.testRotary) {
-                    rotaryAngle = new sensors.RotaryAngleSensor(1);
+                    rotaryAngle = new sensors.RotaryAngleSensor(0);
                     rotaryAngle.start();
                     rotaryAngle.on('data', function (res) {
                         console.log('Rotary angle: ' + res);
@@ -45,7 +50,7 @@ function start() {
                 }
 
                 if (options.testButton) {
-                    button = new sensors.ButtonSensor(4);
+                    button = new sensors.ButtonSensor(7);
                     button.on('down', function (res) {
                         console.log('Button down: ' + res);
                     });
@@ -58,7 +63,7 @@ function start() {
                 }
 
                 if (options.testLightAnalog) {
-                    lightAnalog = new sensors.CustomLightAnalogSensor(0);
+                    lightAnalog = new sensors.CustomLightAnalogSensor(1);
                     setInterval(lightanalogLoop, 200);
                 }
 
@@ -66,6 +71,22 @@ function start() {
                     dust = new sensors.DustSensor(2);
                     dust.start();
                     setInterval(dustLoop, 30 * 1000);
+                }
+
+                if (options.testBuzzerOnMotion) {
+                    buzzer = new sensors.Buzzer(4);
+                }
+
+                if (options.testMotion) {
+                    motion = new sensors.MotionSensor(8);
+                    motion.on('change', function (res) {
+                        console.log(res);
+                        if (res === 1 && options.testBuzzerOnMotion) {
+                            buzzer.turnOn();
+                            setTimeout((() => buzzer.turnOff()), 5000);
+                        }
+                    });
+                    motion.watch(200);
                 }
 
             } else {
@@ -96,7 +117,7 @@ function lightanalogLoop() {
 
 function dustLoop() {
     if (!dust) throw Error('you need to initialize the sensor');
-    
+
     let res = dust.readAvgMax();
     console.log(`Current avg concentration ${res.avg} and max: ${res.max} pcs/0.01cf`);
 }
@@ -111,7 +132,7 @@ function onExit(err) {
 
     if (options.testLoudness) loudness.stop();
     if (options.testRotary) rotaryAngle.stop();
-    if(options.testDust) dust.stop();
+    if (options.testDust) dust.stop();
 
     board.close();
     process.removeAllListeners();

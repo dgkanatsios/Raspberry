@@ -2,6 +2,7 @@
 require('dotenv').config();
 const GrovePi = require('node-grovepi').GrovePi;
 const helpers = require('./helpers');
+const moment = require('moment');
 const DEBUG = false;
 
 const i2c = require('i2c-bus');
@@ -11,7 +12,8 @@ let dhtsensor = null,
     lightsensor = null,
     loudnessSensor = null,
     lcd = null,
-    dust = null;
+    dust = null,
+    motion = null;
 
 const sensors = require('./sensors');
 const huehandler = require('./hue/huehandler');
@@ -21,6 +23,8 @@ const deviceID = 1;
 const Board = GrovePi.board;
 
 const loopInterval = 1000 * 60;
+
+let motionDetectedWithinLastMinute = null;
 
 const board = new Board({
     debug: true,
@@ -39,7 +43,7 @@ const board = new Board({
             lcd.setRGB(123, 98, 45);
             console.log('RBG LCD initialized');
 
-            lightsensor = new sensors.CustomLightAnalogSensor(0);
+            lightsensor = new sensors.CustomLightAnalogSensor(1);
             console.log('Light sensor initialized');
 
             loudnessSensor = new sensors.LoudnessSensor(2, 5);
@@ -49,6 +53,15 @@ const board = new Board({
             dust = new sensors.DustSensor(2);
             dust.start();
             console.log('Dust sensor initialized');
+
+            motion = new sensors.MotionSensor(8);
+            motion.on('change', function (res) {
+                if (res === 1) { //motion detected
+                    motionDetectedWithinLastMinute = moment.utc();
+                }
+            });
+            motion.watch(200);
+            console.log('PIR Motion sensor initialized');
 
             huehandler.start();
             console.log('Hue handler initialized');
@@ -68,7 +81,7 @@ function loop() {
     if (DEBUG) console.log(`Current avg sound value: ${resLoudness.avg}, max: ${resLoudness.max}`);
 
     const resDust = dust.readAvgMax();
-    if(DEBUG) console.log(`Current dust concentration value: ${resDust.avg}, max: ${resDust.max}`);
+    if (DEBUG) console.log(`Current dust concentration value: ${resDust.avg}, max: ${resDust.max}`);
 
     const resTemp = dhtsensor.read();
     if (resTemp) {
@@ -83,6 +96,13 @@ function loop() {
             result.dustAvg = resDust.avg;
             result.dustMax = resDust.max;
             result.deviceID = deviceID;
+
+            if (motionDetectedWithinLastMinute != null) { //motion detected during this minute
+                result.motionDetectedWithinLastMinute = motionDetectedWithinLastMinute;
+            } else {
+                result.motionDetectedWithinLastMinute = 'NO';
+            }
+            motionDetectedWithinLastMinute = null; //reset it
 
             helpers.postData(result).then(response => console.log(response)).catch(err => handleError(err));
             lcd.setText(`T${helpers.round(result.temperature,1)},H${helpers.round(result.humidity,1)},HI${helpers.round(result.heatIndex,1)},L${helpers.round(result.light,0)},S${helpers.round(result.soundAvg,0)},D${helpers.round(result.dustAvg,1)}`);

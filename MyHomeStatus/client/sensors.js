@@ -8,5 +8,7 @@ module.exports = {
     CustomLightAnalogSensor: require('./mysensors/CustomLightAnalogSensor'),
     RotaryAngleSensor: require('./mysensors/RotaryAngleSensor'),
     ButtonSensor: require('./mysensors/DigitalButton'),
-    DustSensor: require('./mysensors/CustomDustDigitalSensor')
+    DustSensor: require('./mysensors/CustomDustDigitalSensor'),
+    MotionSensor: GrovePi.sensors.DigitalInput,
+    Buzzer : GrovePi.sensors.DigitalOutput
 }

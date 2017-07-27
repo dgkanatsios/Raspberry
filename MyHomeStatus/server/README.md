@@ -16,8 +16,8 @@ forever start -o out.log -e err.log server.js
 Or you can publish it to Docker Hub
 
 ```bash
-docker build -t YOURNAME/MyHomeStatus:0.1
-docker push
+docker build -t YOURNAME/myhomestatus:0.1 .
+docker push YOURNAME/myhomestatus
 ```
 
 and then run it
@@ -31,5 +31,5 @@ docker run -d -p 3000:3000 \
 -e DEVICE_CREDENTIAL -e STORAGE_ACCOUNT \
 -e STORAGE_ACCESS_KEY -e PORT \
 --name myhomestatus \
- YOURNAME/MyHomeStatus:0.1
+ YOURNAME/myhomestatus:0.1
 ```

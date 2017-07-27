@@ -2,6 +2,8 @@ const helpers = require('./helpers');
 const azure = require('azure-storage');
 const moment = require('moment');
 
+let lastMotionDetectionTime = null;
+
 function uploadLatest(rawbody) {
     //add UTC time
     rawbody.datetime = moment.utc();
@@ -41,10 +43,18 @@ function getLatest() {
         const blobService = azure.createBlobService(process.env.STORAGE_ACCOUNT,
             process.env.STORAGE_ACCESS_KEY);
         blobService.getBlobToText(helpers.containerName, helpers.latestBlob, function (error, result) {
-            if (error)
+            if (error) {
                 reject(error);
-            else
-                resolve(result);
+            } else {
+                result = JSON.parse(result);
+                if (result.motionDetectedWithinLastMinute === 'NO') {
+                    result.latestMotionDetectionTime = lastMotionDetectionTime || 'N/A';
+                } else {
+                    result.latestMotionDetectionTime = result.motionDetectedWithinLastMinute;
+                    lastMotionDetectionTime = result.motionDetectedWithinLastMinute;
+                }
+                resolve(JSON.stringify(result));
+            }
         });
     });
 }

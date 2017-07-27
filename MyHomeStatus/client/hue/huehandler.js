@@ -30,13 +30,13 @@ const api = new HueApi(host, username);
 
 
 const start = function () {
-    rotarySensor = new sensors.RotaryAngleSensor(1);
+    rotarySensor = new sensors.RotaryAngleSensor(0);
     rotarySensor.start();
     rotarySensor.on('data', function (res) {
         handleRotaryAngle(res);
     });
 
-    button = new sensors.ButtonSensor(4);
+    button = new sensors.ButtonSensor(7);
     button.on('down', function (arg) {
         if (arg === 'singlepress') {
             changeScene();

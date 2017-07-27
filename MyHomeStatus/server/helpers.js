@@ -13,12 +13,17 @@ function deleteCredentialProperty(body) {
     Reflect.deleteProperty(body, 'credential');
 }
 
+function handleError(msg){
+    console.log(msg);
+}
+
 const containerName = 'statuscontainer';
 const latestBlob = 'latest';
 
 module.exports = {
     verifyRequestBody,
     deleteCredentialProperty,
+    handleError,
     containerName,
     latestBlob
 }
