@@ -1,3 +1,5 @@
+[![unofficial Google Analytics for GitHub](https://gaforgithub.azurewebsites.net/api?repo=Raspberry)](https://github.com/dgkanatsios/gaforgithub)
+
 # Various samples of code on Raspberry PI
 
 ## SenseHatGames
